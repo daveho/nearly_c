@@ -2,6 +2,13 @@
 #include "node.h"
 %}
 
+  /* See: https://github.com/bingmann/flex-bison-cpp-example/blob/master/src/parser.yy */
+%require "3.2"
+%debug
+%defines
+%skeleton "lalr1.cc"
+%define api.parser.class { Parser }
+
 %union {
   Node *node;
 }
