@@ -18,9 +18,13 @@ int main(int argc, char **argv) {
   }
 
   ParserState *pp = new ParserState;
+  pp->cur_loc = Location(filename, 1, 1);
 
   yylex_init(&pp->scan_info);
   yyset_in(in, pp->scan_info);
+
+  // make the ParserState available from the lexer state
+  yyset_extra(pp, pp->scan_info);
 
   yyparse(pp);
 

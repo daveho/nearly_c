@@ -12,7 +12,7 @@ typedef union YYSTYPE YYSTYPE;
 int yylex(YYSTYPE *, void *);
 
 // Nor does it declare yyerror()
-void yyerror(struct ParserState *pp, const char *msg);
+void yyerror(struct ParserState *, const char *);
 %}
 
 %define api.pure
@@ -58,6 +58,11 @@ void yyerror(struct ParserState *pp, const char *msg);
 %%
 
 unit
+  : token
+  | token unit
+  ;
+
+token
   : TOK_IF
   | TOK_ELSE
   ;
