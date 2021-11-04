@@ -4,7 +4,13 @@
 #include "parser_state.h"
 
 int create_token(int, const char *, YYSTYPE *, ParserState *);
+
+// Macro to get the pointer to the ParserState from the lexer
+// state, which is available (according to YY_DECL) in the
+// "yyscanner" parameter to yylex()
 #define PSTATE() static_cast<ParserState *>(yyget_extra(yyscanner))
+
+// Declaration of yyerror()
 void yyerror(struct ParserState *, const char *);
 %}
 
@@ -21,6 +27,9 @@ void yyerror(struct ParserState *, const char *);
 
 ";"                { return create_token(TOK_SEMICOLON, yytext, yylval, PSTATE()); }
 ":"                { return create_token(TOK_COLON, yytext, yylval, PSTATE()); }
+","                { return create_token(TOK_COMMA, yytext, yylval, PSTATE()); }
+"."                { return create_token(TOK_DOT, yytext, yylval, PSTATE()); }
+"?"                { return create_token(TOK_QUESTION, yytext, yylval, PSTATE()); }
 
 "+"                { return create_token(TOK_PLUS, yytext, yylval, PSTATE()); }
 "++"               { return create_token(TOK_INCREMENT, yytext, yylval, PSTATE()); }
@@ -61,6 +70,7 @@ void yyerror(struct ParserState *, const char *);
 "signed"           { return create_token(TOK_SIGNED, yytext, yylval, PSTATE()); }
 "float"            { return create_token(TOK_FLOAT, yytext, yylval, PSTATE()); }
 "double"           { return create_token(TOK_DOUBLE, yytext, yylval, PSTATE()); }
+"void"             { return create_token(TOK_VOID, yytext, yylval, PSTATE()); }
 "return"           { return create_token(TOK_RETURN, yytext, yylval, PSTATE()); }
 "break"            { return create_token(TOK_BREAK, yytext, yylval, PSTATE()); }
 "continue"         { return create_token(TOK_CONTINUE, yytext, yylval, PSTATE()); }
@@ -72,10 +82,10 @@ void yyerror(struct ParserState *, const char *);
 "struct"           { return create_token(TOK_STRUCT, yytext, yylval, PSTATE()); }
 "union"            { return create_token(TOK_UNION, yytext, yylval, PSTATE()); }
 
-  /* TODO: identifier */
+[A-Za-z_][A-Za-z_0-9]* { return create_token(TOK_IDENT, yytext, yylval, PSTATE()); }
 
 [ \t\r]+           { PSTATE()->cur_loc.advance(int(yyleng)); }
-"\n"               { PSTATE()->cur_loc.next_line(); }
+\n                 { PSTATE()->cur_loc.next_line(); }
 
 .                  { yyerror(PSTATE(), "Unrecognized character"); }
 
@@ -89,6 +99,8 @@ int create_token(int token_tag, const char *lexeme, YYSTYPE *semantic_value, Par
   semantic_value->node = tok;
 
   pp->cur_loc.advance(int(tok->get_strval().size()));
+
+  printf("read token: %s(%d)\n", lexeme, token_tag);
 
   return token_tag;
 }
