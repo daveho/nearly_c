@@ -8,13 +8,13 @@ OBJS = $(SRCS:%.cpp=%.o)
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $*.cpp -o $*.o
 
-all : nearly_c
+all : parse.tab.h lex.yy.h nearly_c
 
-nearly_c : $(OBJS) parse.tab.h lex.yy.h
+nearly_c : $(OBJS)
 	$(CXX) -o $@ $(OBJS)
 
 parse.tab.h parse.tab.cpp : parse.y
-	bison --output-file=parse.tab.cpp --defines=parse.tab.h parse.y
+	bison -v --output-file=parse.tab.cpp --defines=parse.tab.h parse.y
 
 lex.yy.cpp lex.yy.h : lex.l
 	flex --outfile=lex.yy.cpp --header-file=lex.yy.h lex.l
