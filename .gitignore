@@ -1,5 +1,8 @@
 *.swp
 /*.o
+/nearly_c
 /parse.tab.cpp
 /parse.tab.h
-/lex.yy.cc
+/lex.yy.cpp
+/lex.yy.h
+/depend.mak

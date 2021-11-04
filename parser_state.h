@@ -2,7 +2,9 @@
 #define PARSER_STATE_H
 
 struct ParserState {
-  yyscan_t scaninfo;
+  // To avoid depending on yyscan_t, just hard-code knowledge that
+  // yyscan_t is just a typedef for void *
+  void *scan_info;
 };
 
 #endif // PARSER_STATE_H

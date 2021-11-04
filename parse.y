@@ -4,13 +4,32 @@
 
 // This is a weird hack required to make bison pass the
 // yyscan_t value representing the scanner state (which is
-// stored in the ParserState object) to yylex.
+// stored in the ParserState object) to yylex()
 #define the_scanner pp->scan_info
+
+// Bison does not actually declare yylex()
+typedef union YYSTYPE YYSTYPE;
+int yylex(YYSTYPE *, void *);
+
+// Nor does it declare yyerror()
+void yyerror(struct ParserState *pp, const char *msg);
 %}
 
 %define api.pure
+
+  /*
+   * A ParserState object has all of the state for the lexer
+   * and parser
+   */
 %parse-param { struct ParserState *pp }
-%lex-param { yyscan_t the_scanner }
+
+  /*
+   * Note that lex-param only controls the actual argument to yylex,
+   * and can only consist of a single token (hence the need to make
+   * it a #define so the lexer state can be accessed within the
+   * ParserState object
+   */
+%lex-param { the_scanner }
 
 %union {
   Node *node;
@@ -44,3 +63,10 @@ unit
   ;
 
 %%
+
+void yyerror(struct ParserState *pp, const char *msg) {
+  // FIXME: throw exception?
+  // FIXME: report location
+  fprintf(stderr, "Error: %s\n", msg);
+  exit(1);
+}
