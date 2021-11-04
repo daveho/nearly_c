@@ -1,5 +1,5 @@
 *.swp
 /*.o
-/parse.tab.c
+/parse.tab.cpp
 /parse.tab.h
 /lex.yy.cc

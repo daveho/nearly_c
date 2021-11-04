@@ -1,13 +1,16 @@
 %{
 #include "node.h"
+#include "parser_state.h"
+
+// This is a weird hack required to make bison pass the
+// yyscan_t value representing the scanner state (which is
+// stored in the ParserState object) to yylex.
+#define the_scanner pp->scan_info
 %}
 
-  /* See: https://github.com/bingmann/flex-bison-cpp-example/blob/master/src/parser.yy */
-%require "3.2"
-%debug
-%defines
-%skeleton "lalr1.cc"
-%define api.parser.class { Parser }
+%define api.pure
+%parse-param { struct ParserState *pp }
+%lex-param { yyscan_t the_scanner }
 
 %union {
   Node *node;
