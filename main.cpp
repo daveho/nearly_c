@@ -26,7 +26,13 @@ int main(int argc, char **argv) {
   // make the ParserState available from the lexer state
   yyset_extra(pp, pp->scan_info);
 
+  pp->parse_tree = nullptr;
+
   yyparse(pp);
+
+  //ParseTreePrint ptp(pp->parse_tree);
+
+  delete pp;
 
   return 0;
 }

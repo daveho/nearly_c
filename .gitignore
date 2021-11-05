@@ -5,5 +5,7 @@
 /parse.tab.h
 /lex.yy.cpp
 /lex.yy.h
+/grammar_symbols.h
+/grammar_symbols.cpp
 /depend.mak
 /parse.output

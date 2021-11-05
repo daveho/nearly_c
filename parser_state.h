@@ -2,6 +2,7 @@
 #define PARSER_STATE_H
 
 #include "location.h"
+class Node;
 
 struct ParserState {
   // To avoid depending on yyscan_t, just hard-code knowledge that
@@ -10,6 +11,8 @@ struct ParserState {
 
   // current location (used by lexer)
   Location cur_loc;
+
+  Node *parse_tree;
 };
 
 #endif // PARSER_STATE_H
