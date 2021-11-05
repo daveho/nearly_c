@@ -155,6 +155,9 @@ statement_list
 
 statement
   : TOK_SEMICOLON
+  | simple_variable_declaration
+  | TOK_STATIC simple_variable_declaration
+  | TOK_EXTERN simple_variable_declaration
   ;
 
 struct_type_definition
