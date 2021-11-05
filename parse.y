@@ -67,7 +67,9 @@ unit
   ;
 
 top_level_declaration
-  : opt_storage_class function_or_variable_declaration_or_definition
+  : function_or_variable_declaration_or_definition
+  | TOK_STATIC function_or_variable_declaration_or_definition
+  | TOK_EXTERN function_or_variable_declaration_or_definition
   | struct_type_definition
   | union_type_definition
   ;
@@ -92,18 +94,23 @@ declarator
   ;
 
 function_definition_or_declaration
-  : type TOK_IDENT TOK_LPAREN parameter_list TOK_RPAREN TOK_LBRACE opt_statement_list TOK_RBRACE
-  | type TOK_IDENT TOK_LPAREN parameter_list TOK_RPAREN TOK_SEMICOLON
+  : type TOK_IDENT TOK_LPAREN function_parameter_list TOK_RPAREN TOK_LBRACE opt_statement_list TOK_RBRACE
+  | type TOK_IDENT TOK_LPAREN function_parameter_list TOK_RPAREN TOK_SEMICOLON
   ;
 
-opt_storage_class
-  : TOK_STATIC
-  | TOK_EXTERN
+function_parameter_list
+  : TOK_VOID
+  | opt_parameter_list
+  ;
+
+opt_parameter_list
+  : parameter_list
   | /* nothing */
   ;
 
 parameter_list
-  : TOK_VOID
+  : simple_variable_declaration
+  | simple_variable_declaration TOK_COMMA parameter_list
   ;
 
 type
