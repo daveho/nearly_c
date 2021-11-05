@@ -6,3 +6,4 @@
 /lex.yy.cpp
 /lex.yy.h
 /depend.mak
+/parse.output

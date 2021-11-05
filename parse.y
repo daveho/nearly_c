@@ -67,52 +67,47 @@ unit
   ;
 
 top_level_declaration
-  : variable_declaration
-  | function_declaration
-  | function_definition
+  : opt_storage_class function_or_variable_declaration_or_definition
   | struct_type_definition
   | union_type_definition
   ;
 
-variable_declaration
-  : opt_storage_class simple_variable_declaration { printf("variable_declaration\n"); }
+function_or_variable_declaration_or_definition
+  : function_definition_or_declaration
+  | simple_variable_declaration
   ;
 
 simple_variable_declaration
-  : opt_type_qualifier type identifier_list { printf("simple_variable_declaration\n"); }
+  : type declarator_list TOK_SEMICOLON
   ;
 
-identifier_list
-  : TOK_IDENT { printf("identifier_list\n"); }
-  | TOK_IDENT TOK_COMMA identifier_list
+declarator_list
+  : declarator
+  | declarator TOK_COMMA declarator_list
   ;
 
-function_declaration
-  : type TOK_IDENT TOK_LPAREN parameter_list TOK_RPAREN TOK_SEMICOLON
+  /* for now, only variables can be declared */
+declarator
+  : TOK_IDENT
+  ;
+
+function_definition_or_declaration
+  : type TOK_IDENT TOK_LPAREN parameter_list TOK_RPAREN TOK_LBRACE opt_statement_list TOK_RBRACE
+  | type TOK_IDENT TOK_LPAREN parameter_list TOK_RPAREN TOK_SEMICOLON
   ;
 
 opt_storage_class
   : TOK_STATIC
   | TOK_EXTERN
-  | /* nothing */ { printf("opt_storage_class\n"); }
-  ;
-
-opt_type_qualifier
-  : TOK_CONST
-  | TOK_VOLATILE
-  | /* nothing */ { printf("opt_type_qualifier\n"); }
+  | /* nothing */
   ;
 
 parameter_list
   : TOK_VOID
   ;
 
-function_definition
-  : type TOK_IDENT TOK_LPAREN parameter_list TOK_RPAREN TOK_LBRACE opt_statement_list TOK_RBRACE
-  ;
-
 type
-  : basic_type { printf("type\n"); }
+  : basic_type
   | TOK_STRUCT TOK_IDENT
   | TOK_UNION TOK_IDENT
   ;
@@ -123,20 +118,22 @@ type
    * Semantic analysis can make sense of them later.
    */
 basic_type
-  : basic_type_keyword { printf("basic_type\n"); }
+  : basic_type_keyword
   | basic_type_keyword basic_type
   ;
 
 basic_type_keyword
   : TOK_CHAR
   | TOK_SHORT
-  | TOK_INT { printf("basic_type_keyword\n"); }
+  | TOK_INT
   | TOK_LONG
   | TOK_UNSIGNED
   | TOK_SIGNED
   | TOK_FLOAT
   | TOK_DOUBLE
   | TOK_VOID
+  | TOK_CONST
+  | TOK_VOLATILE
   ;
 
 opt_statement_list

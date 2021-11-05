@@ -100,7 +100,7 @@ int create_token(int token_tag, const char *lexeme, YYSTYPE *semantic_value, Par
 
   pp->cur_loc.advance(int(tok->get_strval().size()));
 
-  printf("read token: %s(%d)\n", lexeme, token_tag);
+  //printf("read token: %s(%d)\n", lexeme, token_tag);
 
   return token_tag;
 }
