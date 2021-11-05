@@ -1,6 +1,7 @@
 %{
 #include "node.h"
 #include "parser_state.h"
+#include "grammar_symbols.h"
 
 // This is a weird hack required to make bison pass the
 // yyscan_t value representing the scanner state (which is
@@ -59,11 +60,21 @@ void yyerror(struct ParserState *, const char *);
 
 %token<node> TOK_IDENT
 
+%type<node> unit top_level_declaration function_or_variable_declaration_or_definition
+%type<node> simple_variable_declaration
+%type<node> declarator_list declarator
+%type<node> function_definition_or_declaration
+%type<node> function_parameter_list opt_parameter_list parameter_list parameter
+%type<node> type basic_type basic_type_keyword
+%type<node> opt_statement_list statement_list statement
+%type<node> struct_type_definition union_type_definition
+%type<node> opt_simple_variable_declaration_list simple_variable_declaration_list
+
 %%
 
 unit
-  : top_level_declaration
-  | top_level_declaration unit
+  : top_level_declaration      { pp->parse_tree = $$ = new Node(NODE_unit, $1); }
+  | top_level_declaration unit { pp->parse_tree = $$ = $2; $$->prepend_kid($1); }
   ;
 
 top_level_declaration
@@ -109,8 +120,12 @@ opt_parameter_list
   ;
 
 parameter_list
-  : simple_variable_declaration
-  | simple_variable_declaration TOK_COMMA parameter_list
+  : parameter
+  | parameter TOK_COMMA parameter_list
+  ;
+
+parameter
+  : type TOK_IDENT
   ;
 
 type
