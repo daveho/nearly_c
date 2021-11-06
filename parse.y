@@ -32,6 +32,15 @@ void yyerror(struct ParserState *, const char *);
    */
 %lex-param { the_scanner }
 
+  /*
+   * There are 9 shift/reduce conflicts.
+   * For all of them, shifting is the correct action, because
+   * it means the parser will continue parsing an expression
+   * at a higher precedence level before returning to a
+   * lower precedence level.
+   */
+%expect 9
+
 %union {
   Node *node;
 }
