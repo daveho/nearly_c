@@ -60,6 +60,8 @@ void yyerror(struct ParserState *, const char *);
 
 %token<node> TOK_IDENT
 
+%token<node> TOK_STR_LIT TOK_CHAR_LIT TOK_INT_LIT TOK_FP_LIT
+
 %type<node> unit top_level_declaration function_or_variable_declaration_or_definition
 %type<node> simple_variable_declaration
 %type<node> declarator_list declarator
