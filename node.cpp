@@ -16,6 +16,16 @@ Node::Node(int tag, std::initializer_list<Node *> kids)
   }
 }
 
+Node::Node(int tag, const std::vector<Node *> &kids)
+  : m_tag(tag)
+  , m_kids(kids)
+  , m_loc_was_set_explicitly(false) {
+  // parent node's location defaults to first kid's location
+  if (!m_kids.empty()) {
+    m_loc = m_kids[0]->get_loc();
+  }
+}
+
 Node::Node(int tag, const std::string &strval)
   : m_tag(tag)
   , m_strval(strval)

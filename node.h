@@ -23,6 +23,7 @@ public:
 
   Node(int tag);
   Node(int tag, std::initializer_list<Node *> kids);
+  Node(int tag, const std::vector<Node *> &kids);
 
   Node(int tag, const std::string &strval);
   Node(int tag, long ival);
@@ -41,6 +42,7 @@ public:
   void prepend_kid(Node *kid);
   unsigned get_num_kids() const { return unsigned(m_kids.size()); }
   Node *get_kid(unsigned index) const { return m_kids.at(index); }
+  Node *get_last_kid() const { return m_kids.back(); }
 
   const_iterator cbegin() const { return m_kids.cbegin(); }
   const_iterator cend() const { return m_kids.cend(); }

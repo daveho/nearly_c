@@ -17,6 +17,7 @@ public:
   Node *build_ast(Node *t);
 
 private:
+  Node *flatten(int ast_tag, Node *t);
 };
 
 class ASTTreePrint : public ParseTreePrint {

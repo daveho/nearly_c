@@ -13,6 +13,8 @@ struct ParserState {
   Location cur_loc;
 
   Node *parse_tree;
+
+  ParserState() : scan_info(nullptr), parse_tree(nullptr) { }
 };
 
 #endif // PARSER_STATE_H
