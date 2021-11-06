@@ -21,13 +21,7 @@ public:
   typedef std::vector<Node *>::const_iterator const_iterator;
 
   Node(int tag);
-  Node(int tag, Node *kid1);
-  Node(int tag, Node *kid1, Node *kid2);
-  Node(int tag, Node *kid1, Node *kid2, Node *kid3);
-  Node(int tag, Node *kid1, Node *kid2, Node *kid3, Node *kid4);
-  Node(int tag, Node *kid1, Node *kid2, Node *kid3, Node *kid4, Node *kid5);
-  Node(int tag, Node *kid1, Node *kid2, Node *kid3, Node *kid4, Node *kid5, Node *kid6);
-  Node(int tag, Node *kid1, Node *kid2, Node *kid3, Node *kid4, Node *kid5, Node *kid6, Node *kid7);
+  Node(int tag, std::initializer_list<Node *> kids);
 
   Node(int tag, const std::string &strval);
   Node(int tag, long ival);

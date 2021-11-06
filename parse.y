@@ -74,41 +74,41 @@ void yyerror(struct ParserState *, const char *);
 
 unit
   : top_level_declaration
-   { pp->parse_tree = $$ = new Node(NODE_unit, $1); }
+   { pp->parse_tree = $$ = new Node(NODE_unit, {$1}); }
   | top_level_declaration unit
-    { pp->parse_tree = $$ = new Node(NODE_unit, $1, $2); }
+    { pp->parse_tree = $$ = new Node(NODE_unit, {$1, $2}); }
   ;
 
 top_level_declaration
   : function_or_variable_declaration_or_definition
-    { $$ = new Node(NODE_top_level_declaration, $1); }
+    { $$ = new Node(NODE_top_level_declaration, {$1}); }
   | TOK_STATIC function_or_variable_declaration_or_definition
-    { $$ = new Node(NODE_top_level_declaration, $1, $2); }
+    { $$ = new Node(NODE_top_level_declaration, {$1, $2}); }
   | TOK_EXTERN function_or_variable_declaration_or_definition
-    { $$ = new Node(NODE_top_level_declaration, $1, $2); }
+    { $$ = new Node(NODE_top_level_declaration, {$1, $2}); }
   | struct_type_definition
-    { $$ = new Node(NODE_top_level_declaration, $1); }
+    { $$ = new Node(NODE_top_level_declaration, {$1}); }
   | union_type_definition
-    { $$ = new Node(NODE_top_level_declaration, $1); }
+    { $$ = new Node(NODE_top_level_declaration, {$1}); }
   ;
 
 function_or_variable_declaration_or_definition
   : function_definition_or_declaration
-    { $$ = new Node(NODE_function_or_variable_declaration_or_definition, $1); }
+    { $$ = new Node(NODE_function_or_variable_declaration_or_definition, {$1}); }
   | simple_variable_declaration
-    { $$ = new Node(NODE_function_or_variable_declaration_or_definition, $1); }
+    { $$ = new Node(NODE_function_or_variable_declaration_or_definition, {$1}); }
   ;
 
 simple_variable_declaration
   : type declarator_list TOK_SEMICOLON
-    { $$ = new Node(NODE_simple_variable_declaration, $1, $2); }
+    { $$ = new Node(NODE_simple_variable_declaration, {$1, $2}); }
   ;
 
 declarator_list
   : declarator
-    { $$ = new Node(NODE_declarator_list, $1); }
+    { $$ = new Node(NODE_declarator_list, {$1}); }
   | declarator TOK_COMMA declarator_list
-    { $$ = new Node(NODE_declarator_list, $1, $2, $3); }
+    { $$ = new Node(NODE_declarator_list, {$1, $2, $3}); }
   ;
 
   /* for now, only variables can be declared */
