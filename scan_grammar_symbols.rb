@@ -1,9 +1,10 @@
 #! /usr/bin/env ruby
 
-# Generate grammar_symbols.h and grammar_symbols.c from grammar productions
+# Generate grammar_symbols.h and grammar_symbols.cpp from grammar productions
 # in parse.y
 
 print "Generating grammar_symbols.h/grammar_symbols.cpp..."
+STDOUT.flush
 
 START = 1000
 first = true
