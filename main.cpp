@@ -3,6 +3,7 @@
 #include "parse.tab.h"
 #include "lex.yy.h"
 #include "parser_state.h"
+#include "grammar_symbols.h"
 
 int main(int argc, char **argv) {
   if (argc < 2) {
@@ -30,7 +31,8 @@ int main(int argc, char **argv) {
 
   yyparse(pp);
 
-  //ParseTreePrint ptp(pp->parse_tree);
+  ParseTreePrint ptp;
+  ptp.print(pp->parse_tree);
 
   delete pp;
 
