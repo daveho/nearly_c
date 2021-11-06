@@ -11,3 +11,12 @@ int f(void) {
   c = a + b;
   return c;
 }
+
+int sum_to_n(int n) {
+  int sum, i;
+  sum = 0;
+  for (i = 1; i <= n; i++) {
+    sum += i;
+  }
+  return sum;
+}

@@ -32,6 +32,13 @@ void yyerror(struct ParserState *, const char *);
    */
 %lex-param { the_scanner }
 
+  /*
+   * We expect one shift/reduce conflict due to the "dangling else" problem.
+   * Favoring shifting (which is what bison will do) is the correct
+   * resolution.
+   */
+%expect 1
+
 %union {
   Node *node;
 }
@@ -236,6 +243,25 @@ statement
     { $$ = new Node(NODE_statement, {$1, $2}); }
   | TOK_RETURN assignment_expression TOK_SEMICOLON
     { $$ = new Node(NODE_statement, {$1, $2, $3}); }
+  | TOK_LBRACE opt_statement_list TOK_RBRACE
+    { $$ = new Node(NODE_statement, {$1, $2, $3}); }
+  | TOK_WHILE TOK_LPAREN assignment_expression TOK_RPAREN statement
+    { $$ = new Node(NODE_statement, {$1, $2, $3, $4, $5}); }
+  | TOK_DO statement TOK_WHILE TOK_LPAREN assignment_expression TOK_RPAREN TOK_SEMICOLON
+    { $$ = new Node(NODE_statement, {$1, $2, $3, $4, $5, $6, $7}); }
+    /*
+     * TODO: allow variable definition in a for loop initializer,
+     * and also allow initialization, loop condition, and/or update
+     * to be omitted
+     */
+  | TOK_FOR TOK_LPAREN assignment_expression TOK_SEMICOLON
+                       assignment_expression TOK_SEMICOLON
+                       assignment_expression TOK_RPAREN statement
+    { $$ = new Node(NODE_statement, {$1, $2, $3, $4, $5, $6, $7, $8, $9}); }
+  | TOK_IF TOK_LPAREN assignment_expression TOK_RPAREN statement
+    { $$ = new Node(NODE_statement, {$1, $2, $3, $4, $5}); }
+  | TOK_IF TOK_LPAREN assignment_expression TOK_RPAREN statement TOK_ELSE statement
+    { $$ = new Node(NODE_statement, {$1, $2, $3, $4, $5}); }
   ;
 
 struct_type_definition
