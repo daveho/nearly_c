@@ -18,9 +18,9 @@ const int need_ast        = (1 << 1);
 const int need_compile    = (1 << 2);
 
 enum class Mode {
-  PRINT_PARSE_TREE = 10000,
-  PRINT_AST        = 11000 + (need_ast),
-  COMPILE          = 12000 + (need_ast | need_compile),
+  PRINT_PARSE_TREE = 0x8000,
+  PRINT_AST        = 0x9000 + (need_ast),
+  COMPILE          = 0xa000 + (need_ast | need_compile),
 };
 
 int main(int argc, char **argv) {
