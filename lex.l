@@ -16,6 +16,8 @@ void yyerror(struct ParserState *, const char *);
 
 %option noyywrap nounput reentrant bison-bridge
 
+%x C_COMMENT
+
 %%
 
 "("                { return create_token(TOK_LPAREN, yytext, yylval, PSTATE()); }
@@ -86,6 +88,20 @@ void yyerror(struct ParserState *, const char *);
 
 [ \t\r]+           { PSTATE()->cur_loc.advance(int(yyleng)); }
 \n                 { PSTATE()->cur_loc.next_line(); }
+
+  /*
+   * C-style block comment
+   * See: https://stackoverflow.com/questions/2130097/
+   */
+"/*"               { BEGIN(C_COMMENT); PSTATE()->cur_loc.advance(int(yyleng)); }
+<C_COMMENT>"*/"    { BEGIN(INITIAL); PSTATE()->cur_loc.advance(int(yyleng)); }
+<C_COMMENT>\n      { PSTATE()->cur_loc.next_line(); }
+<C_COMMENT>.       { PSTATE()->cur_loc.advance(int(yyleng)); }
+
+  /*
+   * C++-style comment
+   */
+"//"[^\n]*\n       { PSTATE()->cur_loc.next_line(); }
 
 .                  { yyerror(PSTATE(), "Unrecognized character"); }
 
