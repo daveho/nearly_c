@@ -38,12 +38,14 @@ void yyerror(struct ParserState *, const char *);
 
 %token<node> TOK_LPAREN TOK_RPAREN TOK_LBRACKET TOK_RBRACKET TOK_LBRACE TOK_RBRACE
 %token<node> TOK_SEMICOLON TOK_COLON
-%token<node> TOK_COMMA TOK_DOT TOK_QUESTION
+%token<node> TOK_COMMA TOK_DOT TOK_QUESTION TOK_NOT
 
 %token<node> TOK_PLUS TOK_INCREMENT TOK_MINUS TOK_DECREMENT
-%token<node> TOK_ASTERISK TOK_DIVIDE
+%token<node> TOK_ASTERISK TOK_DIVIDE TOK_MOD
 
 %token<node> TOK_AMPERSAND TOK_BITWISE_OR TOK_BITWISE_XOR TOK_BITWISE_COMPL
+%token<node> TOK_LEFT_SHIFT TOK_RIGHT_SHIFT
+
 %token<node> TOK_LOGICAL_AND TOK_LOGICAL_OR
 
 %token<node> TOK_EQUALITY TOK_INEQUALITY TOK_LT TOK_LTE TOK_GT TOK_GTE
@@ -71,6 +73,13 @@ void yyerror(struct ParserState *, const char *);
 %type<node> opt_statement_list statement_list statement
 %type<node> struct_type_definition union_type_definition
 %type<node> opt_simple_variable_declaration_list simple_variable_declaration_list
+%type<node> assignment_expression assignment_op
+%type<node> conditional_expression logical_or_expression logical_and_expression
+%type<node> bitwise_and_expression bitwise_or_expression bitwise_xor_expression
+%type<node> equality_expression relational_expression relational_op
+%type<node> shift_expression additive_expression multiplicative_expression
+%type<node> cast_expression unary_expression postfix_expression primary_expression
+%type<node> argument_expression_list
 
 %%
 
@@ -221,6 +230,8 @@ statement
     { $$ = new Node(NODE_statement, {$1, $2}); }
   | TOK_EXTERN simple_variable_declaration
     { $$ = new Node(NODE_statement, {$1, $2}); }
+  | assignment_expression TOK_SEMICOLON
+    { $$ = new Node(NODE_statement, {$1, $2}); }
   ;
 
 struct_type_definition
@@ -245,6 +256,183 @@ simple_variable_declaration_list
     { $$ = new Node(NODE_simple_variable_declaration_list, {$1}); }
   | simple_variable_declaration simple_variable_declaration_list
     { $$ = new Node(NODE_simple_variable_declaration_list, {$1, $2}); }
+  ;
+
+  /*
+   * Expression grammar rules adapted from
+   * https://www.lysator.liu.se/c/ANSI-C-grammar-y.html
+   */
+
+assignment_expression
+  : unary_expression assignment_op assignment_expression
+    { $$ = new Node(NODE_assignment_expression, {$1, $2}); }
+  | conditional_expression
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  ;
+
+assignment_op
+  : TOK_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  /* TODO: compound assignment operators */
+  ;
+
+conditional_expression
+  : logical_or_expression
+    { $$ = new Node(NODE_conditional_expression, {$1}); }
+  | logical_or_expression TOK_QUESTION assignment_expression TOK_COLON conditional_expression
+    { $$ = new Node(NODE_conditional_expression, {$1, $2, $3, $4, $5}); }
+  ;
+
+logical_or_expression
+  : logical_and_expression
+    { $$ = new Node(NODE_logical_or_expression, {$1}); }
+  | logical_or_expression TOK_LOGICAL_OR logical_and_expression
+    { $$ = new Node(NODE_logical_or_expression, {$1, $2, $3}); }
+  ;
+
+logical_and_expression
+  : bitwise_or_expression
+    { $$ = new Node(NODE_logical_and_expression, {$1}); }
+  | logical_and_expression TOK_LOGICAL_AND bitwise_or_expression
+    { $$ = new Node(NODE_logical_and_expression, {$1, $2, $3}); }
+  ;
+
+bitwise_or_expression
+  : bitwise_xor_expression
+    { $$ = new Node(NODE_bitwise_or_expression, {$1}); }
+  | bitwise_or_expression TOK_BITWISE_OR bitwise_xor_expression
+    { $$ = new Node(NODE_bitwise_or_expression, {$1, $2, $3}); }
+  ;
+
+bitwise_xor_expression
+  : bitwise_and_expression
+   { $$ = new Node(NODE_bitwise_xor_expression, {$1}); }
+  | bitwise_xor_expression TOK_BITWISE_XOR bitwise_and_expression
+   { $$ = new Node(NODE_bitwise_xor_expression, {$1, $2, $3}); }
+  ;
+
+bitwise_and_expression
+  : equality_expression
+    { $$ = new Node(NODE_bitwise_and_expression, {$1}); }
+  | bitwise_and_expression TOK_AMPERSAND equality_expression
+    { $$ = new Node(NODE_bitwise_and_expression, {$1, $2, $3}); }
+  ;
+
+equality_expression
+  : relational_expression
+    { $$ = new Node(NODE_equality_expression, {$1}); }
+  | equality_expression TOK_EQUALITY relational_expression
+    { $$ = new Node(NODE_equality_expression, {$1, $2, $3}); }
+  | equality_expression TOK_INEQUALITY relational_expression
+    { $$ = new Node(NODE_equality_expression, {$1, $2, $3}); }
+  ;
+
+relational_expression
+  : shift_expression
+    { $$ = new Node(NODE_relational_expression, {$1}); }
+  | relational_expression relational_op shift_expression
+    { $$ = new Node(NODE_relational_expression, {$1, $2, $3}); }
+  ;
+
+relational_op
+  : TOK_LT
+    { $$ = new Node(NODE_relational_op, {$1}); }
+  | TOK_LTE
+    { $$ = new Node(NODE_relational_op, {$1}); }
+  | TOK_GT
+    { $$ = new Node(NODE_relational_op, {$1}); }
+  | TOK_GTE
+    { $$ = new Node(NODE_relational_op, {$1}); }
+  ;
+
+shift_expression
+  : additive_expression
+    { $$ = new Node(NODE_shift_expression, {$1}); }
+  | shift_expression TOK_LEFT_SHIFT additive_expression
+    { $$ = new Node(NODE_shift_expression, {$1, $2, $3}); }
+  | shift_expression TOK_RIGHT_SHIFT additive_expression
+    { $$ = new Node(NODE_shift_expression, {$1, $2, $3}); }
+  ;
+
+additive_expression
+  : multiplicative_expression
+    { $$ = new Node(NODE_additive_expression, {$1}); }
+  | additive_expression TOK_PLUS multiplicative_expression
+    { $$ = new Node(NODE_additive_expression, {$1, $2, $3}); }
+  | additive_expression TOK_MINUS multiplicative_expression
+    { $$ = new Node(NODE_additive_expression, {$1, $2, $3}); }
+  ;
+
+multiplicative_expression
+  : cast_expression
+    { $$ = new Node(NODE_multiplicative_expression, {$1}); }
+  | multiplicative_expression TOK_ASTERISK cast_expression
+    { $$ = new Node(NODE_multiplicative_expression, {$1, $2, $3}); }
+  | multiplicative_expression TOK_DIVIDE cast_expression
+    { $$ = new Node(NODE_multiplicative_expression, {$1, $2, $3}); }
+  | multiplicative_expression TOK_MOD cast_expression
+    { $$ = new Node(NODE_multiplicative_expression, {$1, $2, $3}); }
+  ;
+
+cast_expression
+  : unary_expression
+    { $$ = new Node(NODE_cast_expression, {$1}); }
+  | TOK_LPAREN type TOK_RPAREN cast_expression
+    { $$ = new Node(NODE_cast_expression, {$1, $2, $3}); }
+  ;
+
+unary_expression
+  : postfix_expression
+    { $$ = new Node(NODE_unary_expression, {$1}); }
+  | TOK_PLUS cast_expression
+    { $$ = new Node(NODE_unary_expression, {$1, $2}); }
+  | TOK_MINUS cast_expression
+    { $$ = new Node(NODE_unary_expression, {$1, $2}); }
+  | TOK_NOT cast_expression
+    { $$ = new Node(NODE_unary_expression, {$1, $2}); }
+  | TOK_BITWISE_COMPL cast_expression
+    { $$ = new Node(NODE_unary_expression, {$1, $2}); }
+  | TOK_INCREMENT unary_expression
+    { $$ = new Node(NODE_unary_expression, {$1, $2}); }
+  | TOK_DECREMENT unary_expression
+    { $$ = new Node(NODE_unary_expression, {$1, $2}); }
+  ;
+
+postfix_expression
+  : primary_expression
+    { $$ = new Node(NODE_postfix_expression, {$1}); }
+  | postfix_expression TOK_INCREMENT
+    { $$ = new Node(NODE_postfix_expression, {$1, $2}); }
+  | postfix_expression TOK_DECREMENT
+    { $$ = new Node(NODE_postfix_expression, {$1, $2}); }
+  | postfix_expression TOK_LPAREN TOK_RPAREN
+    { $$ = new Node(NODE_postfix_expression, {$1, $2, $3}); }
+  | postfix_expression TOK_LPAREN argument_expression_list TOK_RPAREN
+    { $$ = new Node(NODE_postfix_expression, {$1, $2, $3, $4}); }
+  | postfix_expression TOK_DOT TOK_IDENT
+    { $$ = new Node(NODE_postfix_expression, {$1, $2, $3}); }
+  ;
+
+argument_expression_list
+  : assignment_expression
+    { $$ = new Node(NODE_argument_expression_list, {$1}); }
+  | assignment_expression TOK_COMMA argument_expression_list
+    { $$ = new Node(NODE_argument_expression_list, {$1, $2, $3}); }
+  ;
+
+primary_expression
+  : TOK_INT_LIT
+    { $$ = new Node(NODE_primary_expression, {$1}); }
+  | TOK_CHAR_LIT
+    { $$ = new Node(NODE_primary_expression, {$1}); }
+  | TOK_FP_LIT
+    { $$ = new Node(NODE_primary_expression, {$1}); }
+  | TOK_STR_LIT
+    { $$ = new Node(NODE_primary_expression, {$1}); }
+  | TOK_IDENT
+    { $$ = new Node(NODE_primary_expression, {$1}); }
+  | TOK_LPAREN assignment_expression TOK_RPAREN
+    { $$ = new Node(NODE_primary_expression, {$1, $2, $3}); }
   ;
 
 %%

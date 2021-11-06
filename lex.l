@@ -36,6 +36,7 @@ void yyerror(struct ParserState *, const char *);
 ","                        { CRTOK(TOK_COMMA); }
 "."                        { CRTOK(TOK_DOT); }
 "?"                        { CRTOK(TOK_QUESTION); }
+"!"                        { CRTOK(TOK_NOT); }
 
 "+"                        { CRTOK(TOK_PLUS); }
 "++"                       { CRTOK(TOK_INCREMENT); }
@@ -43,11 +44,14 @@ void yyerror(struct ParserState *, const char *);
 "--"                       { CRTOK(TOK_DECREMENT); }
 "*"                        { CRTOK(TOK_ASTERISK); }
 "/"                        { CRTOK(TOK_DIVIDE); }
+"%"                        { CRTOK(TOK_MOD); }
 
 "&"                        { CRTOK(TOK_AMPERSAND); }
 "|"                        { CRTOK(TOK_BITWISE_OR); }
 "^"                        { CRTOK(TOK_BITWISE_XOR); }
 "~"                        { CRTOK(TOK_BITWISE_COMPL); }
+"<<"                       { CRTOK(TOK_LEFT_SHIFT); }
+">>"                       { CRTOK(TOK_RIGHT_SHIFT); }
 
 "&&"                       { CRTOK(TOK_LOGICAL_AND); }
 "||"                       { CRTOK(TOK_LOGICAL_OR); }
