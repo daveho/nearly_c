@@ -29,12 +29,3 @@ Location &Location::operator=(const Location &rhs) {
   }
   return *this;
 }
-
-void Location::advance(int num_cols) {
-  m_col += num_cols;
-}
-
-void Location::next_line() {
-  m_line++;
-  m_col = 1;
-}
