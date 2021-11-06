@@ -3,7 +3,7 @@
 # Generate grammar_symbols.h and grammar_symbols.c from grammar productions
 # in parse.y
 
-print "Generating grammar_symbols.h/grammar_symbols.c..."
+print "Generating grammar_symbols.h/grammar_symbols.cpp..."
 
 START = 1000
 first = true
