@@ -28,9 +28,6 @@ public:
   Node(int tag, long ival);
   Node(int tag, const std::string &strval, long ival);
 
-  // note that we allow the compiler-generated copy ctor
-  // and assignment operator to be used
-
   virtual ~Node();
 
   int get_tag() const { return m_tag; }
