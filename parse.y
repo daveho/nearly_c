@@ -50,7 +50,9 @@ void yyerror(struct ParserState *, const char *);
 
 %token<node> TOK_EQUALITY TOK_INEQUALITY TOK_LT TOK_LTE TOK_GT TOK_GTE
 
-%token<node> TOK_ASSIGN
+%token<node> TOK_ASSIGN TOK_MUL_ASSIGN TOK_DIV_ASSIGN TOK_MOD_ASSIGN TOK_ADD_ASSIGN
+%token<node> TOK_SUB_ASSIGN TOK_LEFT_ASSIGN TOK_RIGHT_ASSIGN TOK_AND_ASSIGN TOK_XOR_ASSIGN
+%token<node> TOK_OR_ASSIGN
 
 %token<node> TOK_IF TOK_ELSE TOK_WHILE TOK_FOR TOK_DO TOK_SWITCH TOK_CASE
 %token<node> TOK_CHAR TOK_SHORT TOK_INT TOK_LONG TOK_UNSIGNED TOK_SIGNED
@@ -232,6 +234,8 @@ statement
     { $$ = new Node(NODE_statement, {$1, $2}); }
   | assignment_expression TOK_SEMICOLON
     { $$ = new Node(NODE_statement, {$1, $2}); }
+  | TOK_RETURN assignment_expression
+    { $$ = new Node(NODE_statement, {$1, $2}); }
   ;
 
 struct_type_definition
@@ -273,7 +277,26 @@ assignment_expression
 assignment_op
   : TOK_ASSIGN
     { $$ = new Node(NODE_assignment_expression, {$1}); }
-  /* TODO: compound assignment operators */
+  | TOK_MUL_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  | TOK_DIV_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  | TOK_MOD_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  | TOK_ADD_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  | TOK_SUB_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  | TOK_LEFT_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  | TOK_RIGHT_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  | TOK_AND_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  | TOK_XOR_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
+  | TOK_OR_ASSIGN
+    { $$ = new Node(NODE_assignment_expression, {$1}); }
   ;
 
 conditional_expression

@@ -64,6 +64,16 @@ void yyerror(struct ParserState *, const char *);
 ">="                       { CRTOK(TOK_GTE); }
 
 "="                        { CRTOK(TOK_ASSIGN); }
+"*="                       { CRTOK(TOK_MUL_ASSIGN); }
+"/="                       { CRTOK(TOK_DIV_ASSIGN); }
+"%="                       { CRTOK(TOK_MOD_ASSIGN); }
+"+="                       { CRTOK(TOK_ADD_ASSIGN); }
+"-="                       { CRTOK(TOK_SUB_ASSIGN); }
+"<<="                      { CRTOK(TOK_LEFT_ASSIGN); }
+">>="                      { CRTOK(TOK_RIGHT_ASSIGN); }
+"&="                       { CRTOK(TOK_AND_ASSIGN); }
+"^="                       { CRTOK(TOK_XOR_ASSIGN); }
+"|="                       { CRTOK(TOK_OR_ASSIGN); }
 
 "if"                       { CRTOK(TOK_IF); }
 "else"                     { CRTOK(TOK_ELSE); }
