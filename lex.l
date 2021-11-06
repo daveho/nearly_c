@@ -10,6 +10,10 @@ int create_token(int, const char *, YYSTYPE *, ParserState *);
 // "yyscanner" parameter to yylex()
 #define PSTATE() static_cast<ParserState *>(yyget_extra(yyscanner))
 
+// Macro to create a token and return its tag value.
+// Avoids quite a bit of code duplication in the scanner rules.
+#define CRTOK(tag) return create_token(tag, yytext, yylval, PSTATE())
+
 // Declaration of yyerror()
 void yyerror(struct ParserState *, const char *);
 %}
@@ -20,74 +24,90 @@ void yyerror(struct ParserState *, const char *);
 
 %%
 
-"("                { return create_token(TOK_LPAREN, yytext, yylval, PSTATE()); }
-")"                { return create_token(TOK_RPAREN, yytext, yylval, PSTATE()); }
-"["                { return create_token(TOK_LBRACKET, yytext, yylval, PSTATE()); }
-"]"                { return create_token(TOK_RBRACKET, yytext, yylval, PSTATE()); }
-"{"                { return create_token(TOK_LBRACE, yytext, yylval, PSTATE()); }
-"}"                { return create_token(TOK_RBRACE, yytext, yylval, PSTATE()); }
+"("                        { CRTOK(TOK_LPAREN); }
+")"                        { CRTOK(TOK_RPAREN); }
+"["                        { CRTOK(TOK_LBRACKET); }
+"]"                        { CRTOK(TOK_RBRACKET); }
+"{"                        { CRTOK(TOK_LBRACE); }
+"}"                        { CRTOK(TOK_RBRACE); }
 
-";"                { return create_token(TOK_SEMICOLON, yytext, yylval, PSTATE()); }
-":"                { return create_token(TOK_COLON, yytext, yylval, PSTATE()); }
-","                { return create_token(TOK_COMMA, yytext, yylval, PSTATE()); }
-"."                { return create_token(TOK_DOT, yytext, yylval, PSTATE()); }
-"?"                { return create_token(TOK_QUESTION, yytext, yylval, PSTATE()); }
+";"                        { CRTOK(TOK_SEMICOLON); }
+":"                        { CRTOK(TOK_COLON); }
+","                        { CRTOK(TOK_COMMA); }
+"."                        { CRTOK(TOK_DOT); }
+"?"                        { CRTOK(TOK_QUESTION); }
 
-"+"                { return create_token(TOK_PLUS, yytext, yylval, PSTATE()); }
-"++"               { return create_token(TOK_INCREMENT, yytext, yylval, PSTATE()); }
-"-"                { return create_token(TOK_MINUS, yytext, yylval, PSTATE()); }
-"--"               { return create_token(TOK_DECREMENT, yytext, yylval, PSTATE()); }
-"*"                { return create_token(TOK_ASTERISK, yytext, yylval, PSTATE()); }
-"/"                { return create_token(TOK_DIVIDE, yytext, yylval, PSTATE()); }
+"+"                        { CRTOK(TOK_PLUS); }
+"++"                       { CRTOK(TOK_INCREMENT); }
+"-"                        { CRTOK(TOK_MINUS); }
+"--"                       { CRTOK(TOK_DECREMENT); }
+"*"                        { CRTOK(TOK_ASTERISK); }
+"/"                        { CRTOK(TOK_DIVIDE); }
 
-"&"                { return create_token(TOK_AMPERSAND, yytext, yylval, PSTATE()); }
-"|"                { return create_token(TOK_BITWISE_OR, yytext, yylval, PSTATE()); }
-"^"                { return create_token(TOK_BITWISE_XOR, yytext, yylval, PSTATE()); }
-"~"                { return create_token(TOK_BITWISE_COMPL, yytext, yylval, PSTATE()); }
+"&"                        { CRTOK(TOK_AMPERSAND); }
+"|"                        { CRTOK(TOK_BITWISE_OR); }
+"^"                        { CRTOK(TOK_BITWISE_XOR); }
+"~"                        { CRTOK(TOK_BITWISE_COMPL); }
 
-"&&"               { return create_token(TOK_LOGICAL_AND, yytext, yylval, PSTATE()); }
-"||"               { return create_token(TOK_LOGICAL_OR, yytext, yylval, PSTATE()); }
+"&&"                       { CRTOK(TOK_LOGICAL_AND); }
+"||"                       { CRTOK(TOK_LOGICAL_OR); }
 
-"=="               { return create_token(TOK_EQUALITY, yytext, yylval, PSTATE()); }
-"!="               { return create_token(TOK_INEQUALITY, yytext, yylval, PSTATE()); }
-"<"                { return create_token(TOK_LT, yytext, yylval, PSTATE()); }
-"<="               { return create_token(TOK_LTE, yytext, yylval, PSTATE()); }
-">"                { return create_token(TOK_GT, yytext, yylval, PSTATE()); }
-">="               { return create_token(TOK_GTE, yytext, yylval, PSTATE()); }
+"=="                       { CRTOK(TOK_EQUALITY); }
+"!="                       { CRTOK(TOK_INEQUALITY); }
+"<"                        { CRTOK(TOK_LT); }
+"<="                       { CRTOK(TOK_LTE); }
+">"                        { CRTOK(TOK_GT); }
+">="                       { CRTOK(TOK_GTE); }
 
-"="                { return create_token(TOK_ASSIGN, yytext, yylval, PSTATE()); }
+"="                        { CRTOK(TOK_ASSIGN); }
 
-"if"               { return create_token(TOK_IF, yytext, yylval, PSTATE()); }
-"else"             { return create_token(TOK_ELSE, yytext, yylval, PSTATE()); }
-"while"            { return create_token(TOK_WHILE, yytext, yylval, PSTATE()); }
-"for"              { return create_token(TOK_FOR, yytext, yylval, PSTATE()); }
-"do"               { return create_token(TOK_DO, yytext, yylval, PSTATE()); }
-"switch"           { return create_token(TOK_SWITCH, yytext, yylval, PSTATE()); }
-"case"             { return create_token(TOK_CASE, yytext, yylval, PSTATE()); }
-"char"             { return create_token(TOK_CHAR, yytext, yylval, PSTATE()); }
-"short"            { return create_token(TOK_SHORT, yytext, yylval, PSTATE()); }
-"int"              { return create_token(TOK_INT, yytext, yylval, PSTATE()); }
-"long"             { return create_token(TOK_LONG, yytext, yylval, PSTATE()); }
-"unsigned"         { return create_token(TOK_UNSIGNED, yytext, yylval, PSTATE()); }
-"signed"           { return create_token(TOK_SIGNED, yytext, yylval, PSTATE()); }
-"float"            { return create_token(TOK_FLOAT, yytext, yylval, PSTATE()); }
-"double"           { return create_token(TOK_DOUBLE, yytext, yylval, PSTATE()); }
-"void"             { return create_token(TOK_VOID, yytext, yylval, PSTATE()); }
-"return"           { return create_token(TOK_RETURN, yytext, yylval, PSTATE()); }
-"break"            { return create_token(TOK_BREAK, yytext, yylval, PSTATE()); }
-"continue"         { return create_token(TOK_CONTINUE, yytext, yylval, PSTATE()); }
-"static"           { return create_token(TOK_STATIC, yytext, yylval, PSTATE()); }
-"extern"           { return create_token(TOK_EXTERN, yytext, yylval, PSTATE()); }
-"auto"             { return create_token(TOK_AUTO, yytext, yylval, PSTATE()); }
-"const"            { return create_token(TOK_CONST, yytext, yylval, PSTATE()); }
-"volatile"         { return create_token(TOK_VOLATILE, yytext, yylval, PSTATE()); }
-"struct"           { return create_token(TOK_STRUCT, yytext, yylval, PSTATE()); }
-"union"            { return create_token(TOK_UNION, yytext, yylval, PSTATE()); }
+"if"                       { CRTOK(TOK_IF); }
+"else"                     { CRTOK(TOK_ELSE); }
+"while"                    { CRTOK(TOK_WHILE); }
+"for"                      { CRTOK(TOK_FOR); }
+"do"                       { CRTOK(TOK_DO); }
+"switch"                   { CRTOK(TOK_SWITCH); }
+"case"                     { CRTOK(TOK_CASE); }
+"char"                     { CRTOK(TOK_CHAR); }
+"short"                    { CRTOK(TOK_SHORT); }
+"int"                      { CRTOK(TOK_INT); }
+"long"                     { CRTOK(TOK_LONG); }
+"unsigned"                 { CRTOK(TOK_UNSIGNED); }
+"signed"                   { CRTOK(TOK_SIGNED); }
+"float"                    { CRTOK(TOK_FLOAT); }
+"double"                   { CRTOK(TOK_DOUBLE); }
+"void"                     { CRTOK(TOK_VOID); }
+"return"                   { CRTOK(TOK_RETURN); }
+"break"                    { CRTOK(TOK_BREAK); }
+"continue"                 { CRTOK(TOK_CONTINUE); }
+"static"                   { CRTOK(TOK_STATIC); }
+"extern"                   { CRTOK(TOK_EXTERN); }
+"auto"                     { CRTOK(TOK_AUTO); }
+"const"                    { CRTOK(TOK_CONST); }
+"volatile"                 { CRTOK(TOK_VOLATILE); }
+"struct"                   { CRTOK(TOK_STRUCT); }
+"union"                    { CRTOK(TOK_UNION); }
 
-[A-Za-z_][A-Za-z_0-9]* { return create_token(TOK_IDENT, yytext, yylval, PSTATE()); }
+[A-Za-z_][A-Za-z_0-9]*     { CRTOK(TOK_IDENT); }
 
-[ \t\r]+           { PSTATE()->cur_loc.advance(int(yyleng)); }
-\n                 { PSTATE()->cur_loc.next_line(); }
+  /*
+   * String and character literals.
+   * Probably not 100% accurate, but hopefully close enough.
+   */
+\"([^\\\"]|\\.)*\"         { CRTOK(TOK_STR_LIT); }
+'(\\.|[^\\'\n])'           { CRTOK(TOK_CHAR_LIT); }
+
+  /*
+   * Numeric literals: these probably aren't exactly right, but
+   * should be a close approximation.
+   */
+[0-9]+                     { CRTOK(TOK_INT_LIT); }
+0[Xx][0-9A-Fa-f]+[ULul]*   { CRTOK(TOK_INT_LIT); }
+[0-9]+\.[0-9]*[Ff]?        { CRTOK(TOK_FP_LIT); }
+
+
+[ \t\r]+                   { PSTATE()->cur_loc.advance(int(yyleng)); }
+\n                         { PSTATE()->cur_loc.next_line(); }
 
   /*
    * C-style block comment
