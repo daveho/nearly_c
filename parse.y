@@ -151,7 +151,7 @@ function_parameter_list
   : TOK_VOID
     { $$ = new Node(NODE_function_parameter_list, {$1}); }
   | opt_parameter_list
-    { $$ = new Node(NODE_opt_parameter_list); }
+    { $$ = new Node(NODE_function_parameter_list, {$1}); }
   ;
 
 opt_parameter_list
@@ -163,7 +163,7 @@ opt_parameter_list
 
 parameter_list
   : parameter
-    { $$ = new Node(NODE_parameter_list); }
+    { $$ = new Node(NODE_parameter_list, {$1}); }
   | parameter TOK_COMMA parameter_list
     { $$ = new Node(NODE_parameter_list, {$1, $2, $3}); }
   ;
