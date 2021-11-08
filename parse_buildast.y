@@ -1,10 +1,11 @@
 %{
 // parse.y
-// This is the parser that builds parse trees.
+// This is the parser that builds ASTs
 
 #include "node.h"
 #include "parser_state.h"
 #include "grammar_symbols.h"
+#include "ast.h"
 
 // This is a weird hack required to make bison pass the
 // yyscan_t value representing the scanner state (which is
@@ -99,7 +100,7 @@ unit
   : top_level_declaration
    { pp->parse_tree = $$ = new Node(NODE_unit, {$1}); }
   | top_level_declaration unit
-    { pp->parse_tree = $$ = new Node(NODE_unit, {$1, $2}); }
+    { pp->parse_tree = $$ = $2; $$->prepend_kid($1); }
   ;
 
 top_level_declaration
