@@ -98,47 +98,47 @@ void yyerror(struct ParserState *, const char *);
 
 unit
   : top_level_declaration
-   { pp->parse_tree = $$ = new Node(NODE_unit, {$1}); }
+   { pp->parse_tree = $$ = new Node(AST_UNIT, {$1}); }
   | top_level_declaration unit
     { pp->parse_tree = $$ = $2; $$->prepend_kid($1); }
   ;
 
 top_level_declaration
   : function_or_variable_declaration_or_definition
-    { $$ = new Node(NODE_top_level_declaration, {$1}); }
+    { $$ = $1; }
   | TOK_STATIC function_or_variable_declaration_or_definition
-    { $$ = new Node(NODE_top_level_declaration, {$1, $2}); }
+    { $$ = $2; $$->prepend_kid($1); }
   | TOK_EXTERN function_or_variable_declaration_or_definition
-    { $$ = new Node(NODE_top_level_declaration, {$1, $2}); }
+    { $$ = $2; $$->prepend_kid($1); }
   | struct_type_definition
-    { $$ = new Node(NODE_top_level_declaration, {$1}); }
+    { $$ = $1; }
   | union_type_definition
-    { $$ = new Node(NODE_top_level_declaration, {$1}); }
+    { $$ = $1; }
   ;
 
 function_or_variable_declaration_or_definition
   : function_definition_or_declaration
-    { $$ = new Node(NODE_function_or_variable_declaration_or_definition, {$1}); }
+    { $$ = $1; }
   | simple_variable_declaration
-    { $$ = new Node(NODE_function_or_variable_declaration_or_definition, {$1}); }
+    { $$ = $1; }
   ;
 
 simple_variable_declaration
   : type declarator_list TOK_SEMICOLON
-    { $$ = new Node(NODE_simple_variable_declaration, {$1, $2}); }
+    { $$ = new Node(AST_VARIABLE_DECLARATION, {$1, $2}); }
   ;
 
 declarator_list
   : declarator
-    { $$ = new Node(NODE_declarator_list, {$1}); }
+    { $$ = new Node(AST_DECLARATOR_LIST, {$1}); }
   | declarator TOK_COMMA declarator_list
-    { $$ = new Node(NODE_declarator_list, {$1, $2, $3}); }
+    { $$ = $3; $$->prepend_kid($1); }
   ;
 
   /* for now, only variables can be declared */
 declarator
   : TOK_IDENT
-    { $$ = new Node(NODE_declarator, {$1}); }
+    { $$ = new Node(AST_NAMED_DECLARATOR, {$1}); }
   ;
 
 function_definition_or_declaration
@@ -176,11 +176,11 @@ parameter
 
 type
   : basic_type
-    { $$ = new Node(NODE_type, {$1}); }
+    { $$ = $1; }
   | TOK_STRUCT TOK_IDENT
-    { $$ = new Node(NODE_type, {$1, $2}); }
+    { $$ = new Node(AST_STRUCT_TYPE, {$2}); }
   | TOK_UNION TOK_IDENT
-    { $$ = new Node(NODE_type, {$1, $2}); }
+    { $$ = new Node(AST_UNION_TYPE, {$2}); }
   ;
 
   /*
@@ -190,34 +190,34 @@ type
    */
 basic_type
   : basic_type_keyword
-    { $$ = new Node(NODE_basic_type, {$1}); }
+    { $$ = new Node(AST_BASIC_TYPE, {$1}); }
   | basic_type_keyword basic_type
-    { $$ = new Node(NODE_basic_type, {$1, $2}); }
+    { $$ = $2; $$->prepend_kid($1); }
   ;
 
 basic_type_keyword
   : TOK_CHAR
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   | TOK_SHORT
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   | TOK_INT
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   | TOK_LONG
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   | TOK_UNSIGNED
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   | TOK_SIGNED
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   | TOK_FLOAT
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   | TOK_DOUBLE
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   | TOK_VOID
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   | TOK_CONST
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   | TOK_VOLATILE
-    { $$ = new Node(NODE_basic_type_keyword, {$1}); }
+    { $$ = $1; }
   ;
 
 opt_statement_list
