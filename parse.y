@@ -169,7 +169,7 @@ parameter_list
   ;
 
 parameter
-  : type TOK_IDENT
+  : type declarator
     { $$ = new Node(NODE_parameter, {$1, $2}); }
   ;
 
