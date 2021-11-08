@@ -9,18 +9,13 @@
 void usage() {
   fprintf(stderr, "Usage: nearly_c [options...] <filename>\n"
                   "Options:\n"
-                  "  -p   print parse tree\n"
-                  "  -a   print AST\n");
+                  "  -p   print parse tree\n");
   exit(1);
 }
 
-const int need_ast        = (1 << 1);
-const int need_compile    = (1 << 2);
-
 enum class Mode {
-  PRINT_PARSE_TREE = 0x8000,
-  PRINT_AST        = 0x9000 + (need_ast),
-  COMPILE          = 0xa000 + (need_ast | need_compile),
+  PRINT_PARSE_TREE,
+  COMPILE,
 };
 
 int main(int argc, char **argv) {
@@ -35,8 +30,6 @@ int main(int argc, char **argv) {
     std::string arg(argv[index]);
     if (arg == "-p") {
       mode = Mode::PRINT_PARSE_TREE;
-    } else if (arg == "-a") {
-      mode = Mode::PRINT_AST;
     } else {
       break;
     }
@@ -65,18 +58,12 @@ int main(int argc, char **argv) {
 
   yyparse(pp);
 
-  Node *ast = nullptr;
-  if (int(mode) & need_ast) {
-    ASTBuilder ast_builder;
-    ast = ast_builder.build_ast(pp->parse_tree);
-  }
-
   if (mode == Mode::PRINT_PARSE_TREE) {
-    ParseTreePrint ptp;
+    // Note that we use an ASTTreePrint object to print the parse
+    // tree. That way, the parser can build either a parse tree or
+    // an AST, and tree printing should work correctly.
+    ASTTreePrint ptp;
     ptp.print(pp->parse_tree);
-  } else if (mode == Mode::PRINT_AST) {
-    ASTTreePrint atp;
-    atp.print(ast);
   } else if (mode == Mode::COMPILE) {
     printf("TODO: compile the source code\n");
   }

@@ -15,17 +15,6 @@ enum ASTNodeTag {
   AST_NAMED_DECLARATOR,
 };
 
-class ASTBuilder {
-public:
-  ASTBuilder();
-  ~ASTBuilder();
-
-  Node *build_ast(Node *t);
-
-private:
-  Node *flatten(int ast_tag, Node *t);
-};
-
 class ASTTreePrint : public ParseTreePrint {
 public:
   ASTTreePrint();
