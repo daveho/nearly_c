@@ -244,6 +244,8 @@ statement
     { $$ = new Node(NODE_statement, {$1, $2}); }
   | assignment_expression TOK_SEMICOLON
     { $$ = new Node(NODE_statement, {$1, $2}); }
+  | TOK_RETURN TOK_SEMICOLON
+    { $$ = new Node(NODE_statement, {$1, $2}); }
   | TOK_RETURN assignment_expression TOK_SEMICOLON
     { $$ = new Node(NODE_statement, {$1, $2, $3}); }
   | TOK_LBRACE opt_statement_list TOK_RBRACE
