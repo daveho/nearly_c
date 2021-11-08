@@ -250,7 +250,7 @@ statement
   | TOK_RETURN assignment_expression TOK_SEMICOLON
     { $$ = new Node(AST_RETURN_EXPRESSION_STATEMENT, {$2}); }
   | TOK_LBRACE opt_statement_list TOK_RBRACE
-    { $$ = $1;  }
+    { $$ = $2;  }
   | TOK_WHILE TOK_LPAREN assignment_expression TOK_RPAREN statement
     { $$ = new Node(AST_WHILE_STATEMENT, {$3, $5}); }
   | TOK_DO statement TOK_WHILE TOK_LPAREN assignment_expression TOK_RPAREN TOK_SEMICOLON
@@ -272,26 +272,26 @@ statement
 
 struct_type_definition
   : TOK_STRUCT TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE
-    { $$ = new Node(NODE_struct_type_definition, {$1, $2, $3, $4, $5}); }
+    { $$ = new Node(AST_STRUCT_TYPE_DEFINITION, {$4}); }
   ;
 
 union_type_definition
   : TOK_UNION TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE
-    { $$ = new Node(NODE_union_type_definition, {$1, $2, $3, $4, $5}); }
+    { $$ = new Node(AST_UNION_TYPE_DEFINITION, {$4}); }
   ;
 
 opt_simple_variable_declaration_list
   : simple_variable_declaration_list
-    { $$ = new Node(NODE_opt_simple_variable_declaration_list, {$1}); }
+    { $$ = $1; }
   | /* nothing */
-    { $$ = new Node(NODE_opt_simple_variable_declaration_list); }
+    { $$ = new Node(AST_FIELD_DEFINITION_LIST); }
   ;
 
 simple_variable_declaration_list
   : simple_variable_declaration
-    { $$ = new Node(NODE_simple_variable_declaration_list, {$1}); }
+    { $$ = new Node(AST_FIELD_DEFINITION_LIST, {$1}); }
   | simple_variable_declaration simple_variable_declaration_list
-    { $$ = new Node(NODE_simple_variable_declaration_list, {$1, $2}); }
+    { $$ = $2; $$->prepend_kid($1); }
   ;
 
   /*

@@ -31,6 +31,9 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
   case AST_FOR_STATEMENT: return "AST_FOR_STATEMENT";
   case AST_IF_STATEMENT: return "AST_IF_STATEMENT";
   case AST_IF_ELSE_STATEMENT: return "AST_IF_ELSE_STATEMENT";
+  case AST_STRUCT_TYPE_DEFINITION: return "AST_STRUCT_TYPE_DEFINITION";
+  case AST_UNION_TYPE_DEFINITION: return "AST_UNION_TYPE_DEFINITION";
+  case AST_FIELD_DEFINITION_LIST: return "AST_FIELD_DEFINITION_LIST";
 
     // If the tag doesn't match any of the AST node tags,
     // assume it's a parse tree node
