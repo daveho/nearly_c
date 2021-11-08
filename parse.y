@@ -300,34 +300,34 @@ simple_variable_declaration_list
 
 assignment_expression
   : unary_expression assignment_op assignment_expression
-    { $$ = new Node(NODE_assignment_expression, {$1, $2}); }
+    { $$ = new Node(NODE_assignment_expression, {$1, $2, $3}); }
   | conditional_expression
     { $$ = new Node(NODE_assignment_expression, {$1}); }
   ;
 
 assignment_op
   : TOK_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   | TOK_MUL_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   | TOK_DIV_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   | TOK_MOD_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   | TOK_ADD_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   | TOK_SUB_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   | TOK_LEFT_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   | TOK_RIGHT_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   | TOK_AND_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   | TOK_XOR_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   | TOK_OR_ASSIGN
-    { $$ = new Node(NODE_assignment_expression, {$1}); }
+    { $$ = new Node(NODE_assignment_op, {$1}); }
   ;
 
 conditional_expression
