@@ -222,37 +222,39 @@ basic_type_keyword
 
 opt_statement_list
   : statement_list
-    { $$ = new Node(NODE_opt_statement_list, {$1}); }
+    { $$ = $1; }
   | /* nothing */
-    { $$ = new Node(NODE_opt_statement_list); }
+    { $$ = new Node(AST_STATEMENT_LIST); }
   ;
 
 statement_list
   : statement
-    { $$ = new Node(NODE_statement_list, {$1}); }
+    { $$ = new Node(AST_STATEMENT_LIST, {$1}); }
   | statement statement_list
-    { $$ = new Node(NODE_statement_list, {$1, $2}); }
+    { $$ = $2; $$->prepend_kid($1); }
   ;
 
 statement
   : TOK_SEMICOLON
-    { $$ = new Node(NODE_statement, {$1}); }
+    { $$ = new Node(AST_EMPTY_STATEMENT); }
   | simple_variable_declaration
-    { $$ = new Node(NODE_statement, {$1}); }
+    { $$ = $1; }
   | TOK_STATIC simple_variable_declaration
-    { $$ = new Node(NODE_statement, {$1, $2}); }
+    { $$ = $2; $$->prepend_kid($1); }
   | TOK_EXTERN simple_variable_declaration
-    { $$ = new Node(NODE_statement, {$1, $2}); }
+    { $$ = $2; $$->prepend_kid($1); }
   | assignment_expression TOK_SEMICOLON
-    { $$ = new Node(NODE_statement, {$1, $2}); }
+    { $$ = new Node(AST_EXPRESSION_STATEMENT, {$1}); }
+  | TOK_RETURN TOK_SEMICOLON
+    { $$ = new Node(AST_RETURN_STATEMENT); }
   | TOK_RETURN assignment_expression TOK_SEMICOLON
-    { $$ = new Node(NODE_statement, {$1, $2, $3}); }
+    { $$ = new Node(AST_RETURN_EXPRESSION_STATEMENT, {$2}); }
   | TOK_LBRACE opt_statement_list TOK_RBRACE
-    { $$ = new Node(NODE_statement, {$1, $2, $3}); }
+    { $$ = $1;  }
   | TOK_WHILE TOK_LPAREN assignment_expression TOK_RPAREN statement
-    { $$ = new Node(NODE_statement, {$1, $2, $3, $4, $5}); }
+    { $$ = new Node(AST_WHILE_STATEMENT, {$3, $5}); }
   | TOK_DO statement TOK_WHILE TOK_LPAREN assignment_expression TOK_RPAREN TOK_SEMICOLON
-    { $$ = new Node(NODE_statement, {$1, $2, $3, $4, $5, $6, $7}); }
+    { $$ = new Node(AST_DO_WHILE_STATEMENT, {$2, $5}); }
     /*
      * TODO: allow variable definition in a for loop initializer,
      * and also allow initialization, loop condition, and/or update
@@ -261,11 +263,11 @@ statement
   | TOK_FOR TOK_LPAREN assignment_expression TOK_SEMICOLON
                        assignment_expression TOK_SEMICOLON
                        assignment_expression TOK_RPAREN statement
-    { $$ = new Node(NODE_statement, {$1, $2, $3, $4, $5, $6, $7, $8, $9}); }
+    { $$ = new Node(AST_FOR_STATEMENT, {$3, $5, $7, $9}); }
   | TOK_IF TOK_LPAREN assignment_expression TOK_RPAREN statement
-    { $$ = new Node(NODE_statement, {$1, $2, $3, $4, $5}); }
+    { $$ = new Node(AST_IF_STATEMENT, {$3, $5}); }
   | TOK_IF TOK_LPAREN assignment_expression TOK_RPAREN statement TOK_ELSE statement
-    { $$ = new Node(NODE_statement, {$1, $2, $3, $4, $5}); }
+    { $$ = new Node(AST_IF_ELSE_STATEMENT, {$3, $5, $7}); }
   ;
 
 struct_type_definition
