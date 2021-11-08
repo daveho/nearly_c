@@ -143,35 +143,35 @@ declarator
 
 function_definition_or_declaration
   : type TOK_IDENT TOK_LPAREN function_parameter_list TOK_RPAREN TOK_LBRACE opt_statement_list TOK_RBRACE
-    { $$ = new Node(NODE_function_definition_or_declaration, {$1, $2, $3, $4, $5, $6, $7, $8}); }
+    { $$ = new Node(AST_FUNCTION_DEFINITION, {$1, $4, $7}); }
   | type TOK_IDENT TOK_LPAREN function_parameter_list TOK_RPAREN TOK_SEMICOLON
-    { $$ = new Node(NODE_function_definition_or_declaration, {$1, $2, $3, $4, $5, $6}); }
+    { $$ = new Node(AST_FUNCTION_DECLARATION, {$1, $4}); }
   ;
 
 function_parameter_list
   : TOK_VOID
-    { $$ = new Node(NODE_function_parameter_list, {$1}); }
+    { $$ = new Node(AST_FUNCTION_PARAMETER_LIST); }
   | opt_parameter_list
-    { $$ = new Node(NODE_opt_parameter_list); }
+    { $$ = $1; }
   ;
 
 opt_parameter_list
   : parameter_list
-    { $$ = new Node(NODE_opt_parameter_list, {$1}); }
+    { $$ = $1; }
   | /* nothing */
-    { $$ = new Node(NODE_opt_parameter_list); }
+    { $$ = new Node(AST_FUNCTION_PARAMETER_LIST); }
   ;
 
 parameter_list
   : parameter
-    { $$ = new Node(NODE_parameter_list); }
+    { $$ = new Node(AST_FUNCTION_PARAMETER_LIST, {$1}); }
   | parameter TOK_COMMA parameter_list
-    { $$ = new Node(NODE_parameter_list, {$1, $2, $3}); }
+    { $$ = $3; $$->prepend_kid($1); }
   ;
 
 parameter
-  : type TOK_IDENT
-    { $$ = new Node(NODE_parameter, {$1, $2}); }
+  : type declarator
+    { $$ = new Node(AST_FUNCTION_PARAMETER, {$1, $2}); }
   ;
 
 type
