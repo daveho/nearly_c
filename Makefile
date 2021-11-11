@@ -34,7 +34,8 @@ depend.mak :
 	touch $@
 
 clean :
-	rm -f *.o depend.mak
-	rm -f $(GENERATED_SRCS) $(GENERATED_SRCS:%.cpp=%.h)
+	rm -f *.o depend.mak \
+		$(GENERATED_SRCS) $(GENERATED_SRCS:%.cpp=%.h) \
+		-f parse.output nearly_c
 
 include depend.mak
