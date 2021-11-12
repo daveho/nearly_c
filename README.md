@@ -32,7 +32,7 @@ in the compilers course I teach.
 Full modern C (e.g., ISO C, C99, C11, etc.) has surprising complexity.
 However, with some careful omission of difficult language features, such
 as typedefs, we get what I think is a core language that is powerful,
-but not too difficult to understand.
+but not too difficult to understand, analyze, generate code for, etc.
 
 ## Some technical details
 
@@ -57,7 +57,7 @@ symbol names. This script assumes that every nonterminal symbol
 
 ## Parse trees vs. ASTs
 
-THere are actually two parsers, [parse.y](parse.y) and [parse\_buildast.y](parse_buildast.y).
+There are actually two parsers, [parse.y](parse.y) and [parse\_buildast.y](parse_buildast.y).
 The former builds a full parse tree, while the latter builds an AST
 (abstract syntax tree.)  I plan to keep them in sync with each other.
 The former is useful for validating the parser itself, and is probably
@@ -96,7 +96,92 @@ int sum(int a, int b) {
 This input generates the parse tree (using [parse.y](parse.y))
 
 ```
-Skiddly bob
+unit
++--top_level_declaration
+   +--function_or_variable_declaration_or_definition
+      +--function_definition_or_declaration
+         +--type
+         |  +--basic_type
+         |     +--basic_type_keyword
+         |        +--TOK_INT[int]
+         +--TOK_IDENT[sum]
+         +--TOK_LPAREN[(]
+         +--function_parameter_list
+         |  +--opt_parameter_list
+         |     +--parameter_list
+         |        +--parameter
+         |        |  +--type
+         |        |  |  +--basic_type
+         |        |  |     +--basic_type_keyword
+         |        |  |        +--TOK_INT[int]
+         |        |  +--declarator
+         |        |     +--TOK_IDENT[a]
+         |        +--TOK_COMMA[,]
+         |        +--parameter_list
+         |           +--parameter
+         |              +--type
+         |              |  +--basic_type
+         |              |     +--basic_type_keyword
+         |              |        +--TOK_INT[int]
+         |              +--declarator
+         |                 +--TOK_IDENT[b]
+         +--TOK_RPAREN[)]
+         +--TOK_LBRACE[{]
+         +--opt_statement_list
+         |  +--statement_list
+         |     +--statement
+         |        +--TOK_RETURN[return]
+         |        +--assignment_expression
+         |        |  +--conditional_expression
+         |        |     +--logical_or_expression
+         |        |        +--logical_and_expression
+         |        |           +--bitwise_or_expression
+         |        |              +--bitwise_xor_expression
+         |        |                 +--bitwise_and_expression
+         |        |                    +--equality_expression
+         |        |                       +--relational_expression
+         |        |                          +--shift_expression
+         |        |                             +--additive_expression
+         |        |                                +--additive_expression
+         |        |                                |  +--multiplicative_expression
+         |        |                                |     +--cast_expression
+         |        |                                |        +--unary_expression
+         |        |                                |           +--postfix_expression
+         |        |                                |              +--primary_expression
+         |        |                                |                 +--TOK_IDENT[a]
+         |        |                                +--TOK_PLUS[+]
+         |        |                                +--multiplicative_expression
+         |        |                                   +--cast_expression
+         |        |                                      +--unary_expression
+         |        |                                         +--postfix_expression
+         |        |                                            +--primary_expression
+         |        |                                               +--TOK_IDENT[b]
+         |        +--TOK_SEMICOLON[;]
+         +--TOK_RBRACE[}]
 ```
 
 This input generates the AST (using [parse\_buildast.y](parse_buildast.y))
+
+```
+AST_UNIT
++--AST_FUNCTION_DEFINITION
+   +--AST_BASIC_TYPE
+   |  +--TOK_INT[int]
+   +--AST_FUNCTION_PARAMETER_LIST
+   |  +--AST_FUNCTION_PARAMETER
+   |  |  +--AST_BASIC_TYPE
+   |  |  |  +--TOK_INT[int]
+   |  |  +--AST_NAMED_DECLARATOR
+   |  |     +--TOK_IDENT[a]
+   |  +--AST_FUNCTION_PARAMETER
+   |     +--AST_BASIC_TYPE
+   |     |  +--TOK_INT[int]
+   |     +--AST_NAMED_DECLARATOR
+   |        +--TOK_IDENT[b]
+   +--AST_STATEMENT_LIST
+      +--AST_RETURN_EXPRESSION_STATEMENT
+         +--AST_BINARY_EXPRESSION
+            +--TOK_PLUS[+]
+            +--TOK_IDENT[a]
+            +--TOK_IDENT[b]
+```
