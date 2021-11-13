@@ -47,7 +47,6 @@ void TreePrintContext::pushctx(int nsibs_) {
 }
 
 void TreePrintContext::popctx() {
-  //stack_depth--;
   stack.pop_back();
 }
 
