@@ -17,23 +17,25 @@
 // OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
+#include <vector>
+#include <utility>
 #include <cstdio>
+#include <cassert>
 #include "node.h"
 #include "treeprint.h"
 
-// FIXME: use a vector so this doesn't have to be hard-coded
-#define MAX_DEPTH 4096
-
 namespace {
 
+// pair of (index, num siblings):
+// index is which sibling we're currently printing
+typedef std::pair<int, int> StackItem;
+
 struct TreePrintContext {
-  int stack_depth;
-  int index[MAX_DEPTH];
-  int nsibs[MAX_DEPTH];
+  std::vector<StackItem> stack;
   const TreePrint *tp_obj;
 
   TreePrintContext(const TreePrint *tp_obj_)
-    : stack_depth(0), tp_obj(tp_obj_) { }
+    : tp_obj(tp_obj_) { }
 
   void pushctx(int nsibs);
   void popctx();
@@ -41,24 +43,23 @@ struct TreePrintContext {
 };
 
 void TreePrintContext::pushctx(int nsibs_) {
-  int level = stack_depth;
-  index[level] = 0;
-  nsibs[level] = nsibs_;
-  stack_depth++;
+  stack.push_back({ 0, nsibs_ });
 }
 
 void TreePrintContext::popctx() {
-  stack_depth--;
+  //stack_depth--;
+  stack.pop_back();
 }
 
 void TreePrintContext::print_node(Node *n) {
-  int depth = stack_depth;
+  int depth = int(stack.size());
+  assert(depth > 0);
   for (int i = 1; i < depth; i++) {
     if (i == depth-1) {
       printf("+--");
     } else {
-      int level_index = index[i];
-      int level_nsibs = nsibs[i];
+      int level_index = stack[i].first;
+      int level_nsibs = stack[i].second;
       if (level_index < level_nsibs) {
         printf("|  ");
       } else {
@@ -75,7 +76,7 @@ void TreePrintContext::print_node(Node *n) {
     printf("[%s]", str.c_str());
   }
   printf("\n");
-  index[depth-1]++;
+  stack[depth-1].first++;
 
   int nkids = n->get_num_kids();
   pushctx(nkids);
