@@ -19,16 +19,30 @@
 
 #include "node.h"
 
-Node::Node(int tag)
+// Private constructor, used only by other constructors
+Node::Node(int tag, const std::string &strval, long ival, const std::vector<Node *> &kids)
   : m_tag(tag)
-  , m_ival(0L)
+  , m_kids(kids)
+  , m_strval(strval)
+  , m_ival(ival)
   , m_loc_was_set_explicitly(false) {
 }
 
-Node::Node(int tag, std::initializer_list<Node *> kids)
+// Private constructor, used only by other constructors
+Node::Node(int tag, const std::string &strval, long ival, const std::initializer_list<Node *> kids)
   : m_tag(tag)
   , m_kids(kids)
+  , m_strval(strval)
+  , m_ival(ival)
   , m_loc_was_set_explicitly(false) {
+}
+
+Node::Node(int tag)
+  : Node(tag, "", 0L, {}) {
+}
+
+Node::Node(int tag, std::initializer_list<Node *> kids)
+  : Node(tag, "", 0L, kids) {
   // parent node's location defaults to first kid's location
   if (!m_kids.empty()) {
     m_loc = m_kids[0]->get_loc();
@@ -36,9 +50,7 @@ Node::Node(int tag, std::initializer_list<Node *> kids)
 }
 
 Node::Node(int tag, const std::vector<Node *> &kids)
-  : m_tag(tag)
-  , m_kids(kids)
-  , m_loc_was_set_explicitly(false) {
+  : Node(tag, "", 0L, kids) {
   // parent node's location defaults to first kid's location
   if (!m_kids.empty()) {
     m_loc = m_kids[0]->get_loc();
@@ -46,23 +58,15 @@ Node::Node(int tag, const std::vector<Node *> &kids)
 }
 
 Node::Node(int tag, const std::string &strval)
-  : m_tag(tag)
-  , m_strval(strval)
-  , m_ival(0L)
-  , m_loc_was_set_explicitly(false) {
+  : Node(tag, strval, 0L, {}) {
 }
 
 Node::Node(int tag, long ival)
-  : m_tag(tag)
-  , m_ival(ival)
-  , m_loc_was_set_explicitly(false) {
+  : Node(tag, "", ival, {}) {
 }
 
 Node::Node(int tag, const std::string &strval, long ival)
-  : m_tag(tag)
-  , m_strval(strval)
-  , m_ival(ival)
-  , m_loc_was_set_explicitly(false) {
+  : Node(tag, strval, ival, {}) {
 }
 
 Node::~Node() {

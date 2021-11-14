@@ -37,6 +37,9 @@ private:
   Node(const Node &);
   Node &operator=(const Node &);
 
+  Node(int tag, const std::string &strval, long ival, const std::vector<Node *> &kids);
+  Node(int tag, const std::string &strval, long ival, const std::initializer_list<Node *> kids);
+
 public:
   typedef std::vector<Node *>::const_iterator const_iterator;
 
