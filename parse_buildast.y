@@ -162,9 +162,9 @@ declarator
 
 function_definition_or_declaration
   : type TOK_IDENT TOK_LPAREN function_parameter_list TOK_RPAREN TOK_LBRACE opt_statement_list TOK_RBRACE
-    { $$ = new Node(AST_FUNCTION_DEFINITION, {$1, $4, $7}); }
+    { $$ = new Node(AST_FUNCTION_DEFINITION, {$1, $2, $4, $7}); }
   | type TOK_IDENT TOK_LPAREN function_parameter_list TOK_RPAREN TOK_SEMICOLON
-    { $$ = new Node(AST_FUNCTION_DECLARATION, {$1, $4}); }
+    { $$ = new Node(AST_FUNCTION_DECLARATION, {$1, $2, $4}); }
   ;
 
 function_parameter_list
