@@ -69,7 +69,12 @@ int main(int argc, char **argv) {
   try {
     process_source_file(filename, mode);
   } catch (NearlyCException &ex) {
-    fprintf(stderr, "%s\n", ex.what());
+    const Location &loc = ex.get_loc();
+    if (loc.is_valid()) {
+      fprintf(stderr, "Error:%d:%d: %s\n", loc.get_line(), loc.get_col(), ex.what());
+    } else {
+      fprintf(stderr, "Error: %s\n", ex.what());
+    }
     exit(1);
   }
 
@@ -87,7 +92,7 @@ struct CloseFile {
 void process_source_file(const std::string &filename, Mode mode) {
   std::unique_ptr<FILE, CloseFile> in(fopen(filename.c_str(), "r"));
   if (!in) {
-    RuntimeError::raise("Error: Couldn't open '%s'", filename.c_str());
+    RuntimeError::raise("Couldn't open '%s'", filename.c_str());
   }
 
   std::unique_ptr<ParserState> pp(new ParserState);
