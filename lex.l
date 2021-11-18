@@ -22,6 +22,7 @@
 #include "node.h"
 #include "parse.tab.h"
 #include "parser_state.h"
+#include "yyerror.h"
 
 int create_token(int, const char *, YYSTYPE *, ParserState *);
 
@@ -33,9 +34,6 @@ int create_token(int, const char *, YYSTYPE *, ParserState *);
 // Macro to create a token and return its tag value.
 // Avoids quite a bit of code duplication in the scanner rules.
 #define CRTOK(tag) return create_token(tag, yytext, yylval, PSTATE())
-
-// Declaration of yyerror()
-void yyerror(struct ParserState *, const char *);
 %}
 
 %option noyywrap nounput reentrant bison-bridge

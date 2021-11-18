@@ -25,6 +25,7 @@
 #include "node.h"
 #include "parser_state.h"
 #include "grammar_symbols.h"
+#include "yyerror.h"
 
 // This is a weird hack required to make bison pass the
 // yyscan_t value representing the scanner state (which is
@@ -34,9 +35,6 @@
 // Bison does not actually declare yylex()
 typedef union YYSTYPE YYSTYPE;
 int yylex(YYSTYPE *, void *);
-
-// Nor does it declare yyerror()
-void yyerror(struct ParserState *, const char *);
 %}
 
 %define api.pure
@@ -510,10 +508,3 @@ primary_expression
   ;
 
 %%
-
-void yyerror(struct ParserState *pp, const char *msg) {
-  // FIXME: throw exception?
-  // FIXME: report location
-  fprintf(stderr, "Error: %s\n", msg);
-  exit(1);
-}
