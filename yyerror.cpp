@@ -1,6 +1,4 @@
 #include <cstdarg>
-#include <cstdio>
-#include <cstdlib>
 #include "parser_state.h"
 #include "cpputil.h"
 #include "exceptions.h"
