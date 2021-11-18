@@ -183,6 +183,8 @@ AST_UNIT
       +--AST_RETURN_EXPRESSION_STATEMENT
          +--AST_BINARY_EXPRESSION
             +--TOK_PLUS[+]
-            +--TOK_IDENT[a]
-            +--TOK_IDENT[b]
+            +--AST_VARIABLE_REFERENCE
+            |  +--TOK_IDENT[a]
+            +--AST_VARIABLE_REFERENCE
+               +--TOK_IDENT[b]
 ```

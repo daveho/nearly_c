@@ -504,15 +504,15 @@ argument_expression_list
 
 primary_expression
   : TOK_INT_LIT
-    { $$ = $1; }
+    { $$ = new Node(AST_LITERAL_VALUE, {$1}); }
   | TOK_CHAR_LIT
-    { $$ = $1; }
+    { $$ = new Node(AST_LITERAL_VALUE, {$1}); }
   | TOK_FP_LIT
-    { $$ = $1; }
+    { $$ = new Node(AST_LITERAL_VALUE, {$1}); }
   | TOK_STR_LIT
-    { $$ = $1; }
+    { $$ = new Node(AST_LITERAL_VALUE, {$1}); }
   | TOK_IDENT
-    { $$ = $1; }
+    { $$ = new Node(AST_VARIABLE_REFERENCE, {$1}); }
   | TOK_LPAREN assignment_expression TOK_RPAREN
     { $$ = $1; }
   ;

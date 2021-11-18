@@ -62,6 +62,8 @@ std::string ASTTreePrint::node_tag_to_string(int tag) const {
   case AST_FUNCTION_CALL_EXPRESSION: return "AST_FUNCTION_CALL_EXPRESSION";
   case AST_FIELD_REFERENCE_EXPRESSION: return "AST_FIELD_REFERENCE_EXPRESSION";
   case AST_ARGUMENT_EXPRESSION_LIST: return "AST_ARGUMENT_EXPRESSION_LIST";
+  case AST_LITERAL_VALUE: return "AST_LITERAL_VALUE";
+  case AST_VARIABLE_REFERENCE: return "AST_VARIABLE_REFERENCE";
 
     // If the tag doesn't match any of the AST node tags,
     // assume it's a parse tree node
