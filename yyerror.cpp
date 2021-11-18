@@ -4,8 +4,6 @@
 #include "exceptions.h"
 
 void yyerror(struct ParserState *pp, const char *msg, ...) {
-  // This function could be reimplemented to throw an exception
-
   va_list args;
   va_start(args, msg);
   std::string errmsg;
