@@ -44,6 +44,11 @@ private:
 public:
   typedef std::vector<Node *>::const_iterator const_iterator;
 
+  // Node::I is a concise shorthand for std::initializer_list<Node *>,
+  // and is necessary when creating node objects with initializer lists
+  // (for adding children) using an Arena
+  typedef std::initializer_list<Node *> I;
+
   Node(int tag);
   Node(int tag, std::initializer_list<Node *> kids);
   Node(int tag, const std::vector<Node *> &kids);

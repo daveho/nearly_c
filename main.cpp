@@ -28,6 +28,7 @@
 #include "grammar_symbols.h"
 #include "ast.h"
 #include "exceptions.h"
+#include "arena.h"
 
 void usage() {
   fprintf(stderr, "Usage: nearly_c [options...] <filename>\n"
@@ -98,6 +99,15 @@ void process_source_file(const std::string &filename, Mode mode) {
   std::unique_ptr<ParserState> pp(new ParserState);
   pp->cur_loc = Location(filename, 1, 1);
 
+  // Use an Arena to allocate tree nodes.
+  // When the Arena is de-allocated, all of the tree nodes
+  // will be automatically deleted.
+  // Note that this means that the tree *must* be used within this
+  // function. All tree nodes are deleted when this function
+  // returns.
+  Arena arena;
+  pp->arena = &arena;
+
   yylex_init(&pp->scan_info);
   yyset_in(in.get(), pp->scan_info);
 
@@ -105,6 +115,8 @@ void process_source_file(const std::string &filename, Mode mode) {
   yyset_extra(pp.get(), pp->scan_info);
 
   yyparse(pp.get());
+
+  yylex_destroy(pp->scan_info);
 
   if (mode == Mode::PRINT_PARSE_TREE) {
     // Note that we use an ASTTreePrint object to print the parse

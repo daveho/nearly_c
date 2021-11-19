@@ -2,14 +2,14 @@ CXX = g++
 CXXFLAGS = -g -Wall -std=c++14 -I.
 
 GENERATED_SRCS = parse.tab.cpp lex.yy.cpp grammar_symbols.cpp
-SRCS = node.cpp location.cpp treeprint.cpp main.cpp ast.cpp \
+SRCS = node.cpp location.cpp treeprint.cpp main.cpp ast.cpp arena.cpp \
 	yyerror.cpp exceptions.cpp cpputil.cpp $(GENERATED_SRCS)
 OBJS = $(SRCS:%.cpp=%.o)
 
 # Uncomment one of the following depending on whether you
 # want the parser to build a parse tree or build an AST
-#PARSER_SRC = parse.y
-PARSER_SRC = parse_buildast.y
+PARSER_SRC = parse.y
+#PARSER_SRC = parse_buildast.y
 
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $*.cpp -o $*.o

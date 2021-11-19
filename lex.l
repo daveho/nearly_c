@@ -161,7 +161,7 @@ int create_token(int, const char *, YYSTYPE *, ParserState *);
 %%
 
 int create_token(int token_tag, const char *lexeme, YYSTYPE *semantic_value, ParserState *pp) {
-  Node *tok = new Node(token_tag, lexeme);
+  Node *tok = pp->arena->create<Node>(token_tag, lexeme);
   tok->set_loc(pp->cur_loc);
 
   semantic_value->node = tok;

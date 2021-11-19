@@ -18,28 +18,20 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef PARSER_STATE_H
-#define PARSER_STATE_H
-
-#include "location.h"
 #include "arena.h"
-class Node;
 
-struct ParserState {
-  // To avoid depending on yyscan_t, just hard-code knowledge that
-  // yyscan_t is just a typedef for void *
-  void *scan_info;
+ArenaObjectBase::ArenaObjectBase() {
+}
 
-  // current location (used by lexer)
-  Location cur_loc;
+ArenaObjectBase::~ArenaObjectBase() {
+}
 
-  // Pointer to root of parse tree or AST
-  Node *parse_tree;
+Arena::Arena() {
+}
 
-  // Arena used to allocate tree nodes
-  Arena *arena;
-
-  ParserState() : scan_info(nullptr), parse_tree(nullptr), arena(nullptr) { }
-};
-
-#endif // PARSER_STATE_H
+Arena::~Arena() {
+  for (auto i = m_objects.begin(); i != m_objects.end(); i++) {
+    (*i)->on_destroy();
+    delete *i;
+  }
+}
