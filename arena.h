@@ -21,6 +21,7 @@
 #ifndef ARENA_H
 #define ARENA_H
 
+#include <cstddef>
 #include <vector>
 
 class ArenaObjectBase {
@@ -31,6 +32,7 @@ public:
   virtual ~ArenaObjectBase();
 
   virtual void on_destroy() = 0;
+  virtual void *get_obj() = 0;
 };
 
 template<typename ObjType>
@@ -43,37 +45,69 @@ public:
   virtual ~ArenaObject() { }
 
   virtual void on_destroy() {
-    delete m_obj;
+    // Just call the destructor: the Arena is responsible for
+    // freeing the memory.
+    m_obj->~ObjType();
   }
+
+  virtual void *get_obj() { return static_cast<void *>(m_obj); }
 };
 
 // An Arena is a mechanism for allocating objects of varying types so
 // that it is possible to delete all of the objects at once.
 // Objects allocated this way should *not* try to explicitly
 // delete other objects that are allocated in the same Arena.
+//
+// This is an abstract base class. The concrete implementations
+// are BasicArena and ChunkedArena.
 class Arena {
 private:
-  std::vector<ArenaObjectBase *> m_objects;
-
   // copy constructor and assignment operator are prohibited
   Arena(const Arena &);
   Arena &operator=(const Arena &);
 
 public:
   Arena();
-  ~Arena();
+  virtual ~Arena();
 
   // Allocate an object of an arbitrary type with arbitrary constructor
   // arguments. The object will be registered as being part of the Arena,
-  // and its memory will be de-allocated when the Arena is destroyed.
+  // and when the Arena is destroyed, the object will be destroyed
+  // (i.e., its destructor will be called), and its memory will be
+  // automatically deallocated.
   template<typename ObjType, typename... Args>
   ObjType *create(Args... args) {
-    ObjType *obj = new ObjType(args...);
-    ArenaObjectBase *aobj = new ArenaObject<ObjType>(obj);
-    m_objects.push_back(aobj);
+    // Allocate and initialize the object
+    void *obj_buf = alloc(sizeof(ObjType));
+    ObjType *obj = new(obj_buf) ObjType(args...);
+
+    // Allocate and initialize the ArenaObject that will handle calling
+    // the object's destructor
+    void *aobj_buf = alloc(sizeof(ArenaObject<ObjType>));
+    ArenaObjectBase *aobj = new(aobj_buf) ArenaObject<ObjType>(obj);
+
+    // Register the object as being allocated within the Arena
+    add_obj(aobj);
+
     return obj;
   }
+
+protected:
+  virtual void *alloc(size_t size) = 0;
+  virtual void add_obj(ArenaObjectBase *aobj) = 0;
 };
 
+class BasicArena : public Arena {
+private:
+  std::vector<ArenaObjectBase *> m_objects;
+
+public:
+  BasicArena();
+  virtual ~BasicArena();
+
+protected:
+  virtual void *alloc(size_t size);
+  virtual void add_obj(ArenaObjectBase *aobj);
+};
 
 #endif // ARENA_H

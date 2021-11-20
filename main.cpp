@@ -99,13 +99,13 @@ void process_source_file(const std::string &filename, Mode mode) {
   std::unique_ptr<ParserState> pp(new ParserState);
   pp->cur_loc = Location(filename, 1, 1);
 
-  // Use an Arena to allocate tree nodes.
-  // When the Arena is de-allocated, all of the tree nodes
+  // Use a BasicArena to allocate tree nodes.
+  // When the arena is de-allocated, all of the tree nodes
   // will be automatically deleted.
   // Note that this means that the tree *must* be used within this
   // function. All tree nodes are deleted when this function
   // returns.
-  Arena arena;
+  BasicArena arena;
   pp->arena = &arena;
 
   yylex_init(&pp->scan_info);
