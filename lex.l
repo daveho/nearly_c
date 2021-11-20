@@ -166,7 +166,7 @@ int create_token(int token_tag, const char *lexeme, YYSTYPE *semantic_value, Par
 
   semantic_value->node = tok;
 
-  pp->cur_loc.advance(int(tok->get_strval().size()));
+  pp->cur_loc.advance(int(tok->get_str().size()));
 
   //printf("read token: %s(%d)\n", lexeme, token_tag);
 

@@ -21,20 +21,20 @@
 #include "node.h"
 
 // Private constructor, used only by other constructors
-Node::Node(int tag, const std::string &strval, long ival, const std::vector<Node *> &kids)
+Node::Node(int tag, const std::string &str, const Value &value, const std::vector<Node *> &kids)
   : m_tag(tag)
   , m_kids(kids)
-  , m_strval(strval)
-  , m_ival(ival)
+  , m_str(str)
+  , m_value(value)
   , m_loc_was_set_explicitly(false) {
 }
 
 // Private constructor, used only by other constructors
-Node::Node(int tag, const std::string &strval, long ival, const std::initializer_list<Node *> kids)
+Node::Node(int tag, const std::string &str, const Value &value, const std::initializer_list<Node *> kids)
   : m_tag(tag)
   , m_kids(kids)
-  , m_strval(strval)
-  , m_ival(ival)
+  , m_str(str)
+  , m_value(value)
   , m_loc_was_set_explicitly(false) {
 }
 
@@ -58,16 +58,16 @@ Node::Node(int tag, const std::vector<Node *> &kids)
   }
 }
 
-Node::Node(int tag, const std::string &strval)
-  : Node(tag, strval, 0L, {}) {
+Node::Node(int tag, const std::string &str)
+  : Node(tag, str, 0L, {}) {
 }
 
-Node::Node(int tag, long ival)
-  : Node(tag, "", ival, {}) {
+Node::Node(int tag, const Value &value)
+  : Node(tag, "", value, {}) {
 }
 
-Node::Node(int tag, const std::string &strval, long ival)
-  : Node(tag, strval, ival, {}) {
+Node::Node(int tag, const std::string &str, const Value &value)
+  : Node(tag, str, value, {}) {
 }
 
 Node::~Node() {

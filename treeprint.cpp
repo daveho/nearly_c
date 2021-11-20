@@ -69,7 +69,7 @@ void TreePrintContext::print_node(Node *n) {
   }
 
   int tag = n->get_tag();
-  std::string str = n->get_strval();
+  std::string str = n->get_str();
 
   printf("%s", tp_obj->node_tag_to_string(tag).c_str());
   if (!str.empty()) {
