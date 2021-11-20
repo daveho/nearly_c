@@ -133,7 +133,7 @@ int create_token(int, const char *, YYSTYPE *, ParserState *);
    * Numeric literals: these probably aren't exactly right, but
    * should be a close approximation.
    */
-[0-9]+                     { CRTOK(TOK_INT_LIT); }
+[0-9]+[ULul]*              { CRTOK(TOK_INT_LIT); }
 0[Xx][0-9A-Fa-f]+[ULul]*   { CRTOK(TOK_INT_LIT); }
 [0-9]+\.[0-9]*[Ff]?        { CRTOK(TOK_FP_LIT); }
 
