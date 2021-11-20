@@ -99,7 +99,7 @@ void process_source_file(const std::string &filename, Mode mode) {
   std::unique_ptr<ParserState> pp(new ParserState);
   pp->cur_loc = Location(filename, 1, 1);
 
-  // Use a BasicArena to allocate tree nodes.
+  // Use a ChunkedArena to allocate tree nodes.
   // When the arena is de-allocated, all of the tree nodes
   // will be automatically deleted.
   // Note that this means that the tree *must* be used within this
