@@ -105,7 +105,7 @@ void process_source_file(const std::string &filename, Mode mode) {
   // Note that this means that the tree *must* be used within this
   // function. All tree nodes are deleted when this function
   // returns.
-  BasicArena arena;
+  ChunkedArena arena;
   pp->arena = &arena;
 
   yylex_init(&pp->scan_info);

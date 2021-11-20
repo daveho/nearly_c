@@ -22,6 +22,7 @@
 #define ARENA_H
 
 #include <cstddef>
+#include <cassert>
 #include <vector>
 
 class ArenaObjectBase {
@@ -78,12 +79,12 @@ public:
   template<typename ObjType, typename... Args>
   ObjType *create(Args... args) {
     // Allocate and initialize the object
-    void *obj_buf = alloc(sizeof(ObjType));
+    void *obj_buf = alloc(sizeof(ObjType), alignof(ObjType));
     ObjType *obj = new(obj_buf) ObjType(args...);
 
     // Allocate and initialize the ArenaObject that will handle calling
     // the object's destructor
-    void *aobj_buf = alloc(sizeof(ArenaObject<ObjType>));
+    void *aobj_buf = alloc(sizeof(ArenaObject<ObjType>), alignof(ArenaObject<ObjType>));
     ArenaObjectBase *aobj = new(aobj_buf) ArenaObject<ObjType>(obj);
 
     // Register the object as being allocated within the Arena
@@ -93,10 +94,12 @@ public:
   }
 
 protected:
-  virtual void *alloc(size_t size) = 0;
+  virtual void *alloc(size_t size, size_t align) = 0;
   virtual void add_obj(ArenaObjectBase *aobj) = 0;
 };
 
+// BasicArena uses operator new and operator delete to allocate
+// memory.
 class BasicArena : public Arena {
 private:
   std::vector<ArenaObjectBase *> m_objects;
@@ -106,7 +109,47 @@ public:
   virtual ~BasicArena();
 
 protected:
-  virtual void *alloc(size_t size);
+  virtual void *alloc(size_t size, size_t align);
+  virtual void add_obj(ArenaObjectBase *aobj);
+};
+
+// ChunkedArena allocates large-ish "chunks" of memory, and then
+// allocates objects (and ArenaObjects needed as metadata)
+// within the chunks. In theory this is more efficient (in both
+// time and space) than using operator new and operator delete
+// for each allocation.
+class ChunkedArena : public Arena {
+public:
+  // Size of initial chunk.
+  // Total amount of reserved memory doubles each time
+  // we run out of space.  I.e., by default, additional chunks are
+  // allocated as 64KB, 128KB, 256KB, etc.
+  static const size_t DEFAULT_INITIAL_SIZE = 64*1024;
+
+private:
+  struct Chunk {
+    char *m_buf;
+    size_t m_capacity, m_used;
+
+    Chunk(size_t capacity);
+    ~Chunk();
+    size_t get_start_offset(size_t align);
+    bool can_alloc(size_t size, size_t align);
+    char *alloc(size_t size, size_t align);
+  };
+
+  size_t m_total_size;
+  std::vector<Chunk *> m_chunks;
+  std::vector<ArenaObjectBase *> m_objects;
+
+public:
+  // Note that the initial chunk size must be at least as large as
+  // the largest object which will be allocated in the arena.
+  ChunkedArena(size_t initial_size = DEFAULT_INITIAL_SIZE);
+  virtual ~ChunkedArena();
+
+protected:
+  virtual void *alloc(size_t size, size_t align);
   virtual void add_obj(ArenaObjectBase *aobj);
 };
 
