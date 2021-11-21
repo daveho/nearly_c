@@ -24,14 +24,13 @@
 #include <vector>
 #include <string>
 #include "location.h"
-#include "value.h"
+#include "node_base.h"
 
-class Node {
+class Node : public NodeBase {
 private:
   int m_tag;
   std::vector<Node *> m_kids;
   std::string m_str;
-  Value m_value;
   Location m_loc;
   bool m_loc_was_set_explicitly;
 
@@ -39,8 +38,8 @@ private:
   Node(const Node &);
   Node &operator=(const Node &);
 
-  Node(int tag, const std::string &str, const Value &value, const std::vector<Node *> &kids);
-  Node(int tag, const std::string &str, const Value &value, const std::initializer_list<Node *> kids);
+  Node(int tag, const std::string &str, const std::vector<Node *> &kids);
+  Node(int tag, const std::string &str, const std::initializer_list<Node *> kids);
 
 public:
   typedef std::vector<Node *>::const_iterator const_iterator;
@@ -53,19 +52,14 @@ public:
   Node(int tag);
   Node(int tag, std::initializer_list<Node *> kids);
   Node(int tag, const std::vector<Node *> &kids);
-
   Node(int tag, const std::string &str);
-  Node(int tag, const Value &value);
-  Node(int tag, const std::string &str, const Value &value);
 
   virtual ~Node();
 
   int get_tag() const { return m_tag; }
   std::string get_str() const { return m_str; }
-  const Value &get_value() const { return m_value; }
 
   void set_str(const std::string &str) { m_str = str; }
-  void set_value(const Value &value) { m_value = value; }
 
   void append_kid(Node *kid);
   void prepend_kid(Node *kid);
