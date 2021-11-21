@@ -18,24 +18,10 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef NODE_BASE_H
-#define NODE_BASE_H
+#include "node_base.h"
 
-// The Node class will inherit from this type, so you can use it
-// to define any attributes and methods that Node objects should have
-// (constant value, results of semantic analysis, code generation info,
-// etc.)
-class NodeBase {
-private:
-  // fields could go here
+NodeBase::NodeBase() {
+}
 
-  // copy ctor and assignment operator not supported
-  NodeBase(const NodeBase &);
-  NodeBase &operator=(const NodeBase &);
-
-public:
-  NodeBase();
-  virtual ~NodeBase();  
-};
-
-#endif // NODE_BASE_H
+NodeBase::~NodeBase() {
+}
