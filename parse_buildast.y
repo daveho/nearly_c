@@ -514,7 +514,7 @@ primary_expression
   | TOK_IDENT
     { $$ = pp->arena->create<Node>(AST_VARIABLE_REFERENCE, Node::I {$1}); }
   | TOK_LPAREN assignment_expression TOK_RPAREN
-    { $$ = $1; }
+    { $$ = $2; }
   ;
 
 %%
