@@ -3,7 +3,7 @@ CXXFLAGS = -g -Wall -std=c++14 -I.
 
 GENERATED_SRCS = parse.tab.cpp lex.yy.cpp grammar_symbols.cpp
 SRCS = node.cpp node_base.cpp location.cpp treeprint.cpp \
-	main.cpp ast.cpp arena.cpp \
+	main.cpp ast.cpp arena.cpp context.cpp \
 	yyerror.cpp exceptions.cpp cpputil.cpp $(GENERATED_SRCS)
 OBJS = $(SRCS:%.cpp=%.o)
 

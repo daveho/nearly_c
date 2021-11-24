@@ -18,14 +18,8 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <memory>
-#include <cstdio>
 #include <cstdlib>
-#include "node.h"
-#include "parse.tab.h"
-#include "lex.yy.h"
-#include "parser_state.h"
-#include "grammar_symbols.h"
+#include "context.h"
 #include "ast.h"
 #include "exceptions.h"
 #include "arena.h"
@@ -82,48 +76,19 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-struct CloseFile {
-  void operator()(FILE *in) {
-    if (in != nullptr) {
-      fclose(in);
-    }
-  }
-};
-
 void process_source_file(const std::string &filename, Mode mode) {
-  std::unique_ptr<FILE, CloseFile> in(fopen(filename.c_str(), "r"));
-  if (!in) {
-    RuntimeError::raise("Couldn't open '%s'", filename.c_str());
-  }
+  Context ctx;
 
-  std::unique_ptr<ParserState> pp(new ParserState);
-  pp->cur_loc = Location(filename, 1, 1);
-
-  // Use a ChunkedArena to allocate tree nodes.
-  // When the arena is de-allocated, all of the tree nodes
-  // will be automatically deleted.
-  // Note that this means that the tree *must* be used within this
-  // function. All tree nodes are deleted when this function
-  // returns.
-  ChunkedArena arena;
-  pp->arena = &arena;
-
-  yylex_init(&pp->scan_info);
-  yyset_in(in.get(), pp->scan_info);
-
-  // make the ParserState available from the lexer state
-  yyset_extra(pp.get(), pp->scan_info);
-
-  yyparse(pp.get());
-
-  yylex_destroy(pp->scan_info);
+  // Parse the input
+  ctx.parse(filename);
+  Node *ast = ctx.get_ast();
 
   if (mode == Mode::PRINT_PARSE_TREE) {
     // Note that we use an ASTTreePrint object to print the parse
     // tree. That way, the parser can build either a parse tree or
     // an AST, and tree printing should work correctly.
     ASTTreePrint ptp;
-    ptp.print(pp->parse_tree);
+    ptp.print(ast);
   } else if (mode == Mode::COMPILE) {
     printf("TODO: compile the source code\n");
   }
