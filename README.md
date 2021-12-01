@@ -164,7 +164,9 @@ This input generates the AST (using [parse\_buildast.y](parse_buildast.y))
 
 ```
 AST_UNIT
+AST_UNIT
 +--AST_FUNCTION_DEFINITION
+   +--TOK_UNSPECIFIED_STORAGE
    +--AST_BASIC_TYPE
    |  +--TOK_INT[int]
    +--TOK_IDENT[sum]

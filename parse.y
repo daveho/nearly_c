@@ -87,8 +87,22 @@ int yylex(YYSTYPE *, void *);
 %token<node> TOK_FLOAT TOK_DOUBLE
 %token<node> TOK_VOID
 %token<node> TOK_RETURN TOK_BREAK TOK_CONTINUE
-%token<node> TOK_STATIC TOK_EXTERN TOK_AUTO TOK_CONST TOK_VOLATILE
+%token<node> TOK_CONST TOK_VOLATILE
 %token<node> TOK_STRUCT TOK_UNION
+
+  /*
+   * Storage class specifiers: because storage class is optional,
+   * the AST building parser adds TOK_UNSPECIFIED_STORAGE to the AST
+   * for declarations where the storage class isn't specified.
+   * This makes things easier for consumers of the AST, because
+   * they can assume that a storage class is present for
+   * all declarations.
+   *
+   * The parse-tree-building parser (parse.y) does not use
+   * TOK_UNSPECIFIED_STORAGE, and it will never appear in a parse tree.
+   */
+%token<node> TOK_UNSPECIFIED_STORAGE
+%token<node> TOK_STATIC TOK_EXTERN TOK_AUTO
 
 %token<node> TOK_IDENT
 

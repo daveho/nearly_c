@@ -36,6 +36,18 @@
 // Bison does not actually declare yylex()
 typedef union YYSTYPE YYSTYPE;
 int yylex(YYSTYPE *, void *);
+
+namespace {
+  // This function is called to add a TOK_UNSPECIFIED_STORAGE token
+  // to the beginning of a declaration where the storage class was not
+  // specified explicitly.
+  void handle_unspecified_storage(Node *ast, struct ParserState *pp) {
+    Node *first_kid = ast->get_kid(0);
+    Node *unspecified_storage = pp->arena->create<Node>(NODE_TOK_UNSPECIFIED_STORAGE);
+    unspecified_storage->set_loc(first_kid->get_loc());
+    ast->prepend_kid(unspecified_storage);
+  }
+}
 %}
 
 %define api.pure
@@ -88,8 +100,22 @@ int yylex(YYSTYPE *, void *);
 %token<node> TOK_FLOAT TOK_DOUBLE
 %token<node> TOK_VOID
 %token<node> TOK_RETURN TOK_BREAK TOK_CONTINUE
-%token<node> TOK_STATIC TOK_EXTERN TOK_AUTO TOK_CONST TOK_VOLATILE
+%token<node> TOK_CONST TOK_VOLATILE
 %token<node> TOK_STRUCT TOK_UNION
+
+  /*
+   * Storage class specifiers: because storage class is optional,
+   * the AST building parser adds TOK_UNSPECIFIED_STORAGE to the AST
+   * for declarations where the storage class isn't specified.
+   * This makes things easier for consumers of the AST, because
+   * they can assume that a storage class is present for
+   * all declarations.
+   *
+   * The parse-tree-building parser (parse.y) does not use
+   * TOK_UNSPECIFIED_STORAGE, and it will never appear in a parse tree.
+   */
+%token<node> TOK_UNSPECIFIED_STORAGE
+%token<node> TOK_STATIC TOK_EXTERN TOK_AUTO
 
 %token<node> TOK_IDENT
 
@@ -123,7 +149,7 @@ unit
 
 top_level_declaration
   : function_or_variable_declaration_or_definition
-    { $$ = $1; }
+    { $$ = $1; handle_unspecified_storage($$, pp); }
   | TOK_STATIC function_or_variable_declaration_or_definition
     { $$ = $2; $$->prepend_kid($1); }
   | TOK_EXTERN function_or_variable_declaration_or_definition
@@ -256,7 +282,7 @@ statement
   : TOK_SEMICOLON
     { $$ = pp->arena->create<Node>(AST_EMPTY_STATEMENT); }
   | simple_variable_declaration
-    { $$ = $1; }
+    { $$ = $1; handle_unspecified_storage($$, pp); }
   | TOK_STATIC simple_variable_declaration
     { $$ = $2; $$->prepend_kid($1); }
   | TOK_EXTERN simple_variable_declaration
