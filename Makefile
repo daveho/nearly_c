@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -g -Wall -std=c++14 -I.
+CXXFLAGS = -g -Wall -std=c++17 -I.
 
 GENERATED_SRCS = parse.tab.cpp lex.yy.cpp grammar_symbols.cpp
 SRCS = node.cpp node_base.cpp location.cpp treeprint.cpp \
