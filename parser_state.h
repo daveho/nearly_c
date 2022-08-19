@@ -1,4 +1,4 @@
-// Copyright (c) 2021, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright (c) 2021-2022, David H. Hovemeyer <david.hovemeyer@gmail.com>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -22,7 +22,6 @@
 #define PARSER_STATE_H
 
 #include "location.h"
-#include "arena.h"
 class Node;
 
 struct ParserState {
@@ -36,10 +35,7 @@ struct ParserState {
   // Pointer to root of parse tree or AST
   Node *parse_tree;
 
-  // Arena used to allocate tree nodes
-  Arena *arena;
-
-  ParserState() : scan_info(nullptr), parse_tree(nullptr), arena(nullptr) { }
+  ParserState() : scan_info(nullptr), parse_tree(nullptr) { }
 };
 
 #endif // PARSER_STATE_H

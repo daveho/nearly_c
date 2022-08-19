@@ -1,5 +1,5 @@
 %{
-// Copyright (c) 2021, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright (c) 2021-2022, David H. Hovemeyer <david.hovemeyer@gmail.com>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -161,7 +161,7 @@ int create_token(int, const char *, YYSTYPE *, ParserState *);
 %%
 
 int create_token(int token_tag, const char *lexeme, YYSTYPE *semantic_value, ParserState *pp) {
-  Node *tok = pp->arena->create<Node>(token_tag, lexeme);
+  Node *tok = new Node(token_tag, lexeme);
   tok->set_loc(pp->cur_loc);
 
   semantic_value->node = tok;

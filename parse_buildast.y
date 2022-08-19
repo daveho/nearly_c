@@ -1,5 +1,5 @@
 %{
-// Copyright (c) 2021, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright (c) 2021-2022, David H. Hovemeyer <david.hovemeyer@gmail.com>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -43,7 +43,7 @@ namespace {
   // specified explicitly.
   void handle_unspecified_storage(Node *ast, struct ParserState *pp) {
     Node *first_kid = ast->get_kid(0);
-    Node *unspecified_storage = pp->arena->create<Node>(NODE_TOK_UNSPECIFIED_STORAGE);
+    Node *unspecified_storage = new Node(NODE_TOK_UNSPECIFIED_STORAGE);
     unspecified_storage->set_loc(first_kid->get_loc());
     ast->prepend_kid(unspecified_storage);
   }
@@ -142,7 +142,7 @@ namespace {
 
 unit
   : top_level_declaration
-   { pp->parse_tree = $$ = pp->arena->create<Node>(AST_UNIT, Node::I{$1}); }
+   { pp->parse_tree = $$ = new Node(AST_UNIT, Node::I{$1}); }
   | top_level_declaration unit
     { pp->parse_tree = $$ = $2; $$->prepend_kid($1); }
   ;
@@ -169,12 +169,12 @@ function_or_variable_declaration_or_definition
 
 simple_variable_declaration
   : type declarator_list TOK_SEMICOLON
-    { $$ = pp->arena->create<Node>(AST_VARIABLE_DECLARATION, Node::I {$1, $2}); }
+    { $$ = new Node(AST_VARIABLE_DECLARATION, Node::I {$1, $2}); }
   ;
 
 declarator_list
   : declarator
-    { $$ = pp->arena->create<Node>(AST_DECLARATOR_LIST, Node::I {$1}); }
+    { $$ = new Node(AST_DECLARATOR_LIST, Node::I {$1}); }
   | declarator TOK_COMMA declarator_list
     { $$ = $3; $$->prepend_kid($1); }
   ;
@@ -182,19 +182,19 @@ declarator_list
   /* for now, only variables can be declared */
 declarator
   : TOK_IDENT
-    { $$ = pp->arena->create<Node>(AST_NAMED_DECLARATOR, Node::I {$1}); }
+    { $$ = new Node(AST_NAMED_DECLARATOR, Node::I {$1}); }
   ;
 
 function_definition_or_declaration
   : type TOK_IDENT TOK_LPAREN function_parameter_list TOK_RPAREN TOK_LBRACE opt_statement_list TOK_RBRACE
-    { $$ = pp->arena->create<Node>(AST_FUNCTION_DEFINITION, Node::I {$1, $2, $4, $7}); }
+    { $$ = new Node(AST_FUNCTION_DEFINITION, Node::I {$1, $2, $4, $7}); }
   | type TOK_IDENT TOK_LPAREN function_parameter_list TOK_RPAREN TOK_SEMICOLON
-    { $$ = pp->arena->create<Node>(AST_FUNCTION_DECLARATION, Node::I {$1, $2, $4}); }
+    { $$ = new Node(AST_FUNCTION_DECLARATION, Node::I {$1, $2, $4}); }
   ;
 
 function_parameter_list
   : TOK_VOID
-    { $$ = pp->arena->create<Node>(AST_FUNCTION_PARAMETER_LIST); }
+    { $$ = new Node(AST_FUNCTION_PARAMETER_LIST); }
   | opt_parameter_list
     { $$ = $1; }
   ;
@@ -203,28 +203,28 @@ opt_parameter_list
   : parameter_list
     { $$ = $1; }
   | /* nothing */
-    { $$ = pp->arena->create<Node>(AST_FUNCTION_PARAMETER_LIST); }
+    { $$ = new Node(AST_FUNCTION_PARAMETER_LIST); }
   ;
 
 parameter_list
   : parameter
-    { $$ = pp->arena->create<Node>(AST_FUNCTION_PARAMETER_LIST, Node::I {$1}); }
+    { $$ = new Node(AST_FUNCTION_PARAMETER_LIST, Node::I {$1}); }
   | parameter TOK_COMMA parameter_list
     { $$ = $3; $$->prepend_kid($1); }
   ;
 
 parameter
   : type declarator
-    { $$ = pp->arena->create<Node>(AST_FUNCTION_PARAMETER, Node::I {$1, $2}); }
+    { $$ = new Node(AST_FUNCTION_PARAMETER, Node::I {$1, $2}); }
   ;
 
 type
   : basic_type
     { $$ = $1; }
   | TOK_STRUCT TOK_IDENT
-    { $$ = pp->arena->create<Node>(AST_STRUCT_TYPE, Node::I {$2}); }
+    { $$ = new Node(AST_STRUCT_TYPE, Node::I {$2}); }
   | TOK_UNION TOK_IDENT
-    { $$ = pp->arena->create<Node>(AST_UNION_TYPE, Node::I {$2}); }
+    { $$ = new Node(AST_UNION_TYPE, Node::I {$2}); }
   ;
 
   /*
@@ -234,7 +234,7 @@ type
    */
 basic_type
   : basic_type_keyword
-    { $$ = pp->arena->create<Node>(AST_BASIC_TYPE, Node::I {$1}); }
+    { $$ = new Node(AST_BASIC_TYPE, Node::I {$1}); }
   | basic_type_keyword basic_type
     { $$ = $2; $$->prepend_kid($1); }
   ;
@@ -268,19 +268,19 @@ opt_statement_list
   : statement_list
     { $$ = $1; }
   | /* nothing */
-    { $$ = pp->arena->create<Node>(AST_STATEMENT_LIST); }
+    { $$ = new Node(AST_STATEMENT_LIST); }
   ;
 
 statement_list
   : statement
-    { $$ = pp->arena->create<Node>(AST_STATEMENT_LIST, Node::I {$1}); }
+    { $$ = new Node(AST_STATEMENT_LIST, Node::I {$1}); }
   | statement statement_list
     { $$ = $2; $$->prepend_kid($1); }
   ;
 
 statement
   : TOK_SEMICOLON
-    { $$ = pp->arena->create<Node>(AST_EMPTY_STATEMENT); }
+    { $$ = new Node(AST_EMPTY_STATEMENT); }
   | simple_variable_declaration
     { $$ = $1; handle_unspecified_storage($$, pp); }
   | TOK_STATIC simple_variable_declaration
@@ -288,17 +288,17 @@ statement
   | TOK_EXTERN simple_variable_declaration
     { $$ = $2; $$->prepend_kid($1); }
   | assignment_expression TOK_SEMICOLON
-    { $$ = pp->arena->create<Node>(AST_EXPRESSION_STATEMENT, Node::I {$1}); }
+    { $$ = new Node(AST_EXPRESSION_STATEMENT, Node::I {$1}); }
   | TOK_RETURN TOK_SEMICOLON
-    { $$ = pp->arena->create<Node>(AST_RETURN_STATEMENT); }
+    { $$ = new Node(AST_RETURN_STATEMENT); }
   | TOK_RETURN assignment_expression TOK_SEMICOLON
-    { $$ = pp->arena->create<Node>(AST_RETURN_EXPRESSION_STATEMENT, Node::I {$2}); }
+    { $$ = new Node(AST_RETURN_EXPRESSION_STATEMENT, Node::I {$2}); }
   | TOK_LBRACE opt_statement_list TOK_RBRACE
     { $$ = $2;  }
   | TOK_WHILE TOK_LPAREN assignment_expression TOK_RPAREN statement
-    { $$ = pp->arena->create<Node>(AST_WHILE_STATEMENT, Node::I {$3, $5}); }
+    { $$ = new Node(AST_WHILE_STATEMENT, Node::I {$3, $5}); }
   | TOK_DO statement TOK_WHILE TOK_LPAREN assignment_expression TOK_RPAREN TOK_SEMICOLON
-    { $$ = pp->arena->create<Node>(AST_DO_WHILE_STATEMENT, Node::I {$2, $5}); }
+    { $$ = new Node(AST_DO_WHILE_STATEMENT, Node::I {$2, $5}); }
     /*
      * TODO: allow variable definition in a for loop initializer,
      * and also allow initialization, loop condition, and/or update
@@ -307,33 +307,33 @@ statement
   | TOK_FOR TOK_LPAREN assignment_expression TOK_SEMICOLON
                        assignment_expression TOK_SEMICOLON
                        assignment_expression TOK_RPAREN statement
-    { $$ = pp->arena->create<Node>(AST_FOR_STATEMENT, Node::I {$3, $5, $7, $9}); }
+    { $$ = new Node(AST_FOR_STATEMENT, Node::I {$3, $5, $7, $9}); }
   | TOK_IF TOK_LPAREN assignment_expression TOK_RPAREN statement
-    { $$ = pp->arena->create<Node>(AST_IF_STATEMENT, Node::I {$3, $5}); }
+    { $$ = new Node(AST_IF_STATEMENT, Node::I {$3, $5}); }
   | TOK_IF TOK_LPAREN assignment_expression TOK_RPAREN statement TOK_ELSE statement
-    { $$ = pp->arena->create<Node>(AST_IF_ELSE_STATEMENT, Node::I {$3, $5, $7}); }
+    { $$ = new Node(AST_IF_ELSE_STATEMENT, Node::I {$3, $5, $7}); }
   ;
 
 struct_type_definition
   : TOK_STRUCT TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE
-    { $$ = pp->arena->create<Node>(AST_STRUCT_TYPE_DEFINITION, Node::I {$4}); }
+    { $$ = new Node(AST_STRUCT_TYPE_DEFINITION, Node::I {$4}); }
   ;
 
 union_type_definition
   : TOK_UNION TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE
-    { $$ = pp->arena->create<Node>(AST_UNION_TYPE_DEFINITION, Node::I {$4}); }
+    { $$ = new Node(AST_UNION_TYPE_DEFINITION, Node::I {$4}); }
   ;
 
 opt_simple_variable_declaration_list
   : simple_variable_declaration_list
     { $$ = $1; }
   | /* nothing */
-    { $$ = pp->arena->create<Node>(AST_FIELD_DEFINITION_LIST); }
+    { $$ = new Node(AST_FIELD_DEFINITION_LIST); }
   ;
 
 simple_variable_declaration_list
   : simple_variable_declaration
-    { $$ = pp->arena->create<Node>(AST_FIELD_DEFINITION_LIST, Node::I {$1}); }
+    { $$ = new Node(AST_FIELD_DEFINITION_LIST, Node::I {$1}); }
   | simple_variable_declaration simple_variable_declaration_list
     { $$ = $2; $$->prepend_kid($1); }
   ;
@@ -354,7 +354,7 @@ simple_variable_declaration_list
 
 assignment_expression
   : unary_expression assignment_op assignment_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   | conditional_expression
     { $$ = $1; }
   ;
@@ -388,58 +388,58 @@ conditional_expression
   : logical_or_expression
     { $$ = $1; }
   | logical_or_expression TOK_QUESTION assignment_expression TOK_COLON conditional_expression
-    { $$ = pp->arena->create<Node>(AST_CONDITIONAL_EXPRESSION, Node::I {$1, $3, $5}); }
+    { $$ = new Node(AST_CONDITIONAL_EXPRESSION, Node::I {$1, $3, $5}); }
   ;
 
 logical_or_expression
   : logical_and_expression
     { $$ = $1; }
   | logical_or_expression TOK_LOGICAL_OR logical_and_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   ;
 
 logical_and_expression
   : bitwise_or_expression
     { $$ = $1; }
   | logical_and_expression TOK_LOGICAL_AND bitwise_or_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   ;
 
 bitwise_or_expression
   : bitwise_xor_expression
     { $$ = $1; }
   | bitwise_or_expression TOK_BITWISE_OR bitwise_xor_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   ;
 
 bitwise_xor_expression
   : bitwise_and_expression
     { $$ = $1; }
   | bitwise_xor_expression TOK_BITWISE_XOR bitwise_and_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   ;
 
 bitwise_and_expression
   : equality_expression
     { $$ = $1; }
   | bitwise_and_expression TOK_AMPERSAND equality_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   ;
 
 equality_expression
   : relational_expression
     { $$ = $1; }
   | equality_expression TOK_EQUALITY relational_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   | equality_expression TOK_INEQUALITY relational_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   ;
 
 relational_expression
   : shift_expression
     { $$ = $1; }
   | relational_expression relational_op shift_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   ;
 
 relational_op
@@ -457,88 +457,88 @@ shift_expression
   : additive_expression
     { $$ = $1; }
   | shift_expression TOK_LEFT_SHIFT additive_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   | shift_expression TOK_RIGHT_SHIFT additive_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   ;
 
 additive_expression
   : multiplicative_expression
     { $$ = $1; }
   | additive_expression TOK_PLUS multiplicative_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   | additive_expression TOK_MINUS multiplicative_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   ;
 
 multiplicative_expression
   : cast_expression
     { $$ = $1; }
   | multiplicative_expression TOK_ASTERISK cast_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   | multiplicative_expression TOK_DIVIDE cast_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   | multiplicative_expression TOK_MOD cast_expression
-    { $$ = pp->arena->create<Node>(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
+    { $$ = new Node(AST_BINARY_EXPRESSION, Node::I {$2, $1, $3}); }
   ;
 
 cast_expression
   : unary_expression
     { $$ = $1; }
   | TOK_LPAREN type TOK_RPAREN cast_expression
-    { $$ = pp->arena->create<Node>(AST_CAST_EXPRESSION, Node::I {$1, $2}); }
+    { $$ = new Node(AST_CAST_EXPRESSION, Node::I {$1, $2}); }
   ;
 
 unary_expression
   : postfix_expression
     { $$ = $1; }
   | TOK_PLUS cast_expression
-    { $$ = pp->arena->create<Node>(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
+    { $$ = new Node(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
   | TOK_MINUS cast_expression
-    { $$ = pp->arena->create<Node>(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
+    { $$ = new Node(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
   | TOK_NOT cast_expression
-    { $$ = pp->arena->create<Node>(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
+    { $$ = new Node(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
   | TOK_BITWISE_COMPL cast_expression
-    { $$ = pp->arena->create<Node>(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
+    { $$ = new Node(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
   | TOK_INCREMENT unary_expression
-    { $$ = pp->arena->create<Node>(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
+    { $$ = new Node(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
   | TOK_DECREMENT unary_expression
-    { $$ = pp->arena->create<Node>(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
+    { $$ = new Node(AST_UNARY_EXPRESSION, Node::I {$1, $2}); }
   ;
 
 postfix_expression
   : primary_expression
     { $$ = $1; }
   | postfix_expression TOK_INCREMENT
-    { $$ = pp->arena->create<Node>(AST_POSTFIX_EXPRESSION, Node::I {$2, $1}); }
+    { $$ = new Node(AST_POSTFIX_EXPRESSION, Node::I {$2, $1}); }
   | postfix_expression TOK_DECREMENT
-    { $$ = pp->arena->create<Node>(AST_POSTFIX_EXPRESSION, Node::I {$2, $1}); }
+    { $$ = new Node(AST_POSTFIX_EXPRESSION, Node::I {$2, $1}); }
   | postfix_expression TOK_LPAREN TOK_RPAREN
-    { $$ = pp->arena->create<Node>(AST_FUNCTION_CALL_EXPRESSION, Node::I {$1}); }
+    { $$ = new Node(AST_FUNCTION_CALL_EXPRESSION, Node::I {$1}); }
   | postfix_expression TOK_LPAREN argument_expression_list TOK_RPAREN
-    { $$ = pp->arena->create<Node>(AST_FUNCTION_CALL_EXPRESSION, Node::I {$1, $3}); }
+    { $$ = new Node(AST_FUNCTION_CALL_EXPRESSION, Node::I {$1, $3}); }
   | postfix_expression TOK_DOT TOK_IDENT
-    { $$ = pp->arena->create<Node>(AST_FIELD_REFERENCE_EXPRESSION, Node::I {$1, $3}); }
+    { $$ = new Node(AST_FIELD_REFERENCE_EXPRESSION, Node::I {$1, $3}); }
   ;
 
 argument_expression_list
   : assignment_expression
-    { $$ = pp->arena->create<Node>(AST_ARGUMENT_EXPRESSION_LIST, Node::I {$1}); }
+    { $$ = new Node(AST_ARGUMENT_EXPRESSION_LIST, Node::I {$1}); }
   | assignment_expression TOK_COMMA argument_expression_list
     { $$ = $3; $$->prepend_kid($1); }
   ;
 
 primary_expression
   : TOK_INT_LIT
-    { $$ = pp->arena->create<Node>(AST_LITERAL_VALUE, Node::I {$1}); }
+    { $$ = new Node(AST_LITERAL_VALUE, Node::I {$1}); }
   | TOK_CHAR_LIT
-    { $$ = pp->arena->create<Node>(AST_LITERAL_VALUE, Node::I {$1}); }
+    { $$ = new Node(AST_LITERAL_VALUE, Node::I {$1}); }
   | TOK_FP_LIT
-    { $$ = pp->arena->create<Node>(AST_LITERAL_VALUE, Node::I {$1}); }
+    { $$ = new Node(AST_LITERAL_VALUE, Node::I {$1}); }
   | TOK_STR_LIT
-    { $$ = pp->arena->create<Node>(AST_LITERAL_VALUE, Node::I {$1}); }
+    { $$ = new Node(AST_LITERAL_VALUE, Node::I {$1}); }
   | TOK_IDENT
-    { $$ = pp->arena->create<Node>(AST_VARIABLE_REFERENCE, Node::I {$1}); }
+    { $$ = new Node(AST_VARIABLE_REFERENCE, Node::I {$1}); }
   | TOK_LPAREN assignment_expression TOK_RPAREN
     { $$ = $2; }
   ;

@@ -1,4 +1,4 @@
-// Copyright (c) 2021, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright (c) 2021-2022, David H. Hovemeyer <david.hovemeyer@gmail.com>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -25,6 +25,12 @@
 #include <string>
 #include "location.h"
 #include "node_base.h"
+
+// Tree node class, suitable for parse trees and ASTs.
+// Nodes can also be used as tokens returned by a lexer.
+// Note that parent nodes take responsibility for deleting
+// their children, so to delete an entire tree, it is
+// sufficient to delete the root.
 
 class Node : public NodeBase {
 private:

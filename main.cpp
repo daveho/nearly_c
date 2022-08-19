@@ -1,4 +1,4 @@
-// Copyright (c) 2021, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright (c) 2021-2022, David H. Hovemeyer <david.hovemeyer@gmail.com>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -22,7 +22,6 @@
 #include "context.h"
 #include "ast.h"
 #include "exceptions.h"
-#include "arena.h"
 
 void usage() {
   fprintf(stderr, "Usage: nearly_c [options...] <filename>\n"

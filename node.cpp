@@ -1,4 +1,4 @@
-// Copyright (c) 2021, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright (c) 2021-2022, David H. Hovemeyer <david.hovemeyer@gmail.com>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -61,6 +61,10 @@ Node::Node(int tag, const std::string &str)
 }
 
 Node::~Node() {
+  // delete child nodes
+  for (auto i = m_kids.begin(); i != m_kids.end(); ++i) {
+    delete *i;
+  }
 }
 
 void Node::append_kid(Node *kid) {
