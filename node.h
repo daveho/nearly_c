@@ -50,11 +50,6 @@ private:
 public:
   typedef std::vector<Node *>::const_iterator const_iterator;
 
-  // Node::I is a concise shorthand for std::initializer_list<Node *>,
-  // and is necessary when creating node objects with initializer lists
-  // (for adding children) using an Arena
-  typedef std::initializer_list<Node *> I;
-
   Node(int tag);
   Node(int tag, std::initializer_list<Node *> kids);
   Node(int tag, const std::vector<Node *> &kids);
@@ -78,6 +73,16 @@ public:
 
   void set_loc(const Location &loc) { m_loc = loc; m_loc_was_set_explicitly = true; }
   const Location &get_loc() const { return m_loc; }
+
+  // do a preorder traversal of the tree, invoking specified
+  // function on each node
+  template<typename Fn>
+  void preorder(Fn fn) {
+    fn(this);
+    for (auto i = m_kids.begin(); i != m_kids.end(); ++i) {
+      (*i)->preorder(fn);
+    }
+  }
 };
 
 #endif // NODE_H

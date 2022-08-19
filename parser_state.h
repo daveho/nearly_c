@@ -21,6 +21,7 @@
 #ifndef PARSER_STATE_H
 #define PARSER_STATE_H
 
+#include <vector>
 #include "location.h"
 class Node;
 
@@ -34,6 +35,11 @@ struct ParserState {
 
   // Pointer to root of parse tree or AST
   Node *parse_tree;
+
+  // Vector of pointers to Nodes created by the lexer to represent tokens.
+  // This can be used to clean up any tokens that aren't incorporated
+  // into the tree built by the parser.
+  std::vector<Node *> tokens;
 
   ParserState() : scan_info(nullptr), parse_tree(nullptr) { }
 };

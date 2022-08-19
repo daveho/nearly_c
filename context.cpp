@@ -18,6 +18,7 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+#include <set>
 #include <memory>
 #include <cassert>
 #include "exceptions.h"
@@ -65,5 +66,18 @@ void Context::parse(const std::string &filename) {
   // parse the input source code
   yyparse(pp.get());
 
+  // free memory allocated by flex
+  yylex_destroy(pp->scan_info);
+
   m_ast = pp->parse_tree;
+
+  // delete any Nodes that were created by the lexer,
+  // but weren't incorporated into the parse tree
+  std::set<Node *> tree_nodes;
+  m_ast->preorder([&tree_nodes](Node *n) { tree_nodes.insert(n); });
+  for (auto i = pp->tokens.begin(); i != pp->tokens.end(); ++i) {
+    if (tree_nodes.count(*i) == 0) {
+      delete *i;
+    }
+  }
 }

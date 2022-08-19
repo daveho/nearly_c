@@ -168,6 +168,9 @@ int create_token(int token_tag, const char *lexeme, YYSTYPE *semantic_value, Par
 
   pp->cur_loc.advance(int(tok->get_str().size()));
 
+  // keep track of the Nodes created by the lexer
+  pp->tokens.push_back(tok);
+
   //printf("read token: %s(%d)\n", lexeme, token_tag);
 
   return token_tag;
