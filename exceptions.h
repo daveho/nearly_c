@@ -38,8 +38,8 @@ public:
 };
 
 #ifdef __GNUC__
-#  define RT_PRINTF_FORMAT __attribute__ ((format (printf, 1, 2)))
-#  define EX_PRINTF_FORMAT __attribute__ ((format (printf, 2, 3)))
+#  define RT_PRINTF_FORMAT __attribute__ ((format (printf, 1, 2), noreturn))
+#  define EX_PRINTF_FORMAT __attribute__ ((format (printf, 2, 3), noreturn))
 #else
 #  define RT_PRINTF_FORMAT
 #  define EX_PRINTF_FORMAT
