@@ -25,23 +25,23 @@
 #include "exceptions.h"
 
 ////////////////////////////////////////////////////////////////////////
-// NearlyCException member functions
+// BaseException member functions
 ////////////////////////////////////////////////////////////////////////
 
-NearlyCException::NearlyCException(const Location &loc, const std::string &desc)
+BaseException::BaseException(const Location &loc, const std::string &desc)
   : std::runtime_error(desc)
   , m_loc(loc) {
 }
 
-NearlyCException::NearlyCException(const NearlyCException &other)
+BaseException::BaseException(const BaseException &other)
   : std::runtime_error(other)
   , m_loc(other.m_loc) {
 }
 
-NearlyCException::~NearlyCException() {
+BaseException::~BaseException() {
 }
 
-const Location &NearlyCException::get_loc() const {
+const Location &BaseException::get_loc() const {
   return m_loc;
 }
 
@@ -50,11 +50,11 @@ const Location &NearlyCException::get_loc() const {
 ////////////////////////////////////////////////////////////////////////
 
 RuntimeError::RuntimeError(const std::string &desc)
-  : NearlyCException(Location(), desc) {
+  : BaseException(Location(), desc) {
 }
 
 RuntimeError::RuntimeError(const RuntimeError &other)
-  : NearlyCException(other) {
+  : BaseException(other) {
 }
 
 RuntimeError::~RuntimeError() {
@@ -74,11 +74,11 @@ void RuntimeError::raise(const char *fmt, ...) {
 ////////////////////////////////////////////////////////////////////////
 
 SyntaxError::SyntaxError(const Location &loc, const std::string &desc)
-  : NearlyCException(loc, desc) {
+  : BaseException(loc, desc) {
 }
 
 SyntaxError::SyntaxError(const SyntaxError &other)
-  : NearlyCException(other) {
+  : BaseException(other) {
 }
 
 SyntaxError::~SyntaxError() {
@@ -98,11 +98,11 @@ void SyntaxError::raise(const Location &loc, const char *fmt, ...) {
 ////////////////////////////////////////////////////////////////////////
 
 SemanticError::SemanticError(const Location &loc, const std::string &desc)
-  : NearlyCException(loc, desc) {
+  : BaseException(loc, desc) {
 }
 
 SemanticError::SemanticError(const SemanticError &other)
-  : NearlyCException(other) {
+  : BaseException(other) {
 }
 
 SemanticError::~SemanticError() {

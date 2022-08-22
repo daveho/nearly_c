@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
   const char *filename = argv[index];
   try {
     process_source_file(filename, mode);
-  } catch (NearlyCException &ex) {
+  } catch (BaseException &ex) {
     const Location &loc = ex.get_loc();
     if (loc.is_valid()) {
       fprintf(stderr, "Error:%d:%d: %s\n", loc.get_line(), loc.get_col(), ex.what());

@@ -25,14 +25,14 @@
 #include "location.h"
 
 // Base type for exceptions indicating syntax or semantic errors
-class NearlyCException : public std::runtime_error {
+class BaseException : public std::runtime_error {
 private:
   Location m_loc;
 
 public:
-  NearlyCException(const Location &loc, const std::string &desc);
-  NearlyCException(const NearlyCException &other);
-  virtual ~NearlyCException();
+  BaseException(const Location &loc, const std::string &desc);
+  BaseException(const BaseException &other);
+  virtual ~BaseException();
 
   const Location &get_loc() const;
 };
@@ -47,7 +47,7 @@ public:
 
 // Exception type for general runtime errors that aren't
 // associated with source code
-class RuntimeError : public NearlyCException {
+class RuntimeError : public BaseException {
 public:
   RuntimeError(const std::string &desc);
   RuntimeError(const RuntimeError &other);
@@ -57,7 +57,7 @@ public:
 };
 
 // Exception type for syntax errors
-class SyntaxError : public NearlyCException {
+class SyntaxError : public BaseException {
 public:
   SyntaxError(const Location &loc, const std::string &desc);
   SyntaxError(const SyntaxError &other);
@@ -67,7 +67,7 @@ public:
 };
 
 // Exception type for semantic errors
-class SemanticError : public NearlyCException {
+class SemanticError : public BaseException {
 public:
   SemanticError(const Location &loc, const std::string &desc);
   SemanticError(const SemanticError &other);
