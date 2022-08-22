@@ -34,6 +34,8 @@ public:
   BaseException(const BaseException &other);
   virtual ~BaseException();
 
+  bool has_location() const { return m_loc.is_valid(); }
+
   const Location &get_loc() const;
 };
 
@@ -56,7 +58,7 @@ public:
   static void raise(const char *fmt, ...) RT_PRINTF_FORMAT;
 };
 
-// Exception type for syntax errors
+// Exception type for lexical or syntax errors
 class SyntaxError : public BaseException {
 public:
   SyntaxError(const Location &loc, const std::string &desc);
@@ -72,6 +74,17 @@ public:
   SemanticError(const Location &loc, const std::string &desc);
   SemanticError(const SemanticError &other);
   virtual ~SemanticError();
+
+  static void raise(const Location &loc, const char *fmt, ...) EX_PRINTF_FORMAT;
+};
+
+// Exception type for evaluation errors (reference to undefined
+// variable, divide by 0, etc.)
+class EvaluationError : public BaseException {
+public:
+  EvaluationError(const Location &loc, const std::string &desc);
+  EvaluationError(const EvaluationError &other);
+  virtual ~EvaluationError();
 
   static void raise(const Location &loc, const char *fmt, ...) EX_PRINTF_FORMAT;
 };

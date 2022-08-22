@@ -116,3 +116,27 @@ void SemanticError::raise(const Location &loc, const char *fmt, ...) {
 
   throw SemanticError(loc, errmsg);
 }
+
+////////////////////////////////////////////////////////////////////////
+// EvaluationError member functions
+////////////////////////////////////////////////////////////////////////
+
+EvaluationError::EvaluationError(const Location &loc, const std::string &desc)
+  : BaseException(loc, desc) {
+}
+
+EvaluationError::EvaluationError(const EvaluationError &other)
+  : BaseException(other) {
+}
+
+EvaluationError::~EvaluationError() {
+}
+
+void EvaluationError::raise(const Location &loc, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  std::string errmsg = cpputil::vformat(fmt, args);
+  va_end(args);
+
+  throw EvaluationError(loc, errmsg);
+}
