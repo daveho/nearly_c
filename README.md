@@ -2,17 +2,16 @@
 
 This is a lexer and parser for a substantial subset of C.
 
-C features that are missing:
+C features that are (currently) missing:
 
 * Typedefs
-* Arrays
-* Pointers
 * Variadic functions
 * Abstract declarators (e.g., omitting a parameter name from a function declaration)
+* Pointers to functions
+* Pointers to arrays
+* Returning a pointer from a function
 
 There are probably other things that are missing or don't work.
-
-I will probably add arrays and pointers at some point.
 
 There are also some restrictions. For example, a storage class specifier
 (`static` or `extern`) must precede the type in a declaration or definition,
@@ -23,6 +22,20 @@ int static x;
 ```
 
 isn't allowed.
+
+Also, in an array declaration or definition, all dimensions must have their
+sizes specified as a single integer literal. For example, the following
+code would not be allowed:
+
+```c
+void foo(int a[]) { // <--size of array dimension must be specified
+
+}
+
+int main(void) {
+  int x[4*5]; // <-- size of array dimension must be a single int literal
+}
+```
 
 ## Why?
 
