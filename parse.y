@@ -110,7 +110,7 @@ int yylex(YYSTYPE *, void *);
 
 %type<node> unit top_level_declaration function_or_variable_declaration_or_definition
 %type<node> simple_variable_declaration
-%type<node> declarator_list declarator
+%type<node> declarator_list declarator non_pointer_declarator
 %type<node> function_definition_or_declaration
 %type<node> function_parameter_list opt_parameter_list parameter_list parameter
 %type<node> type basic_type basic_type_keyword
@@ -166,10 +166,20 @@ declarator_list
     { $$ = new Node(NODE_declarator_list, {$1, $2, $3}); }
   ;
 
-  /* for now, only variables can be declared */
+  /* pointers are lower precedence than identifiers/arrays */
 declarator
-  : TOK_IDENT
+  : TOK_ASTERISK declarator
+    { $$ = new Node(NODE_declarator, {$1, $2}); }
+  | non_pointer_declarator
     { $$ = new Node(NODE_declarator, {$1}); }
+  ;
+
+  /* identifiers and arrays are the highest-precedence declarators */
+non_pointer_declarator
+  : TOK_IDENT
+    { $$ = new Node(NODE_non_pointer_declarator, {$1}); }
+  | non_pointer_declarator TOK_LBRACKET TOK_INT_LIT TOK_RBRACKET
+    { $$ = new Node(NODE_non_pointer_declarator, {$1, $2, $3, $4}); }
   ;
 
 function_definition_or_declaration
@@ -482,6 +492,10 @@ unary_expression
     { $$ = new Node(NODE_unary_expression, {$1, $2}); }
   | TOK_DECREMENT unary_expression
     { $$ = new Node(NODE_unary_expression, {$1, $2}); }
+  | TOK_ASTERISK unary_expression
+    { $$ = new Node(NODE_unary_expression, {$1, $2}); }
+  | TOK_AMPERSAND unary_expression
+    { $$ = new Node(NODE_unary_expression, {$1, $2}); }
   ;
 
 postfix_expression
@@ -497,6 +511,8 @@ postfix_expression
     { $$ = new Node(NODE_postfix_expression, {$1, $2, $3, $4}); }
   | postfix_expression TOK_DOT TOK_IDENT
     { $$ = new Node(NODE_postfix_expression, {$1, $2, $3}); }
+  | postfix_expression TOK_LBRACKET assignment_expression TOK_RBRACKET
+    { $$ = new Node(NODE_postfix_expression, {$1, $2, $3, $4}); }
   ;
 
 argument_expression_list

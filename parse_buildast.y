@@ -522,7 +522,7 @@ unary_expression
 
   /*
    * If a postfix expression applies a postfix operator (++ or --),
-   * then the AST is built in a way similar to prefix expressions:
+   * then the AST is built in a way similar to unary expressions:
    * the operator is the first child, and the subexpression is the
    * second child. Function calls, field references, and
    * array element references are labeled with specific AST tags.
