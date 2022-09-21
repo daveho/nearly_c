@@ -514,7 +514,19 @@ unary_expression
     { $$ = new Node(AST_UNARY_EXPRESSION, {$1, $2}); }
   | TOK_DECREMENT unary_expression
     { $$ = new Node(AST_UNARY_EXPRESSION, {$1, $2}); }
+  | TOK_ASTERISK unary_expression
+    { $$ = new Node(AST_UNARY_EXPRESSION, {$1, $2}); }
+  | TOK_AMPERSAND unary_expression
+    { $$ = new Node(AST_UNARY_EXPRESSION, {$1, $2}); }
   ;
+
+  /*
+   * If a postfix expression applies a postfix operator (++ or --),
+   * then the AST is built in a way similar to prefix expressions:
+   * the operator is the first child, and the subexpression is the
+   * second child. Function calls, field references, and
+   * array element references are labeled with specific AST tags.
+   */
 
 postfix_expression
   : primary_expression
@@ -528,7 +540,9 @@ postfix_expression
   | postfix_expression TOK_LPAREN argument_expression_list TOK_RPAREN
     { $$ = new Node(AST_FUNCTION_CALL_EXPRESSION, {$1, $3}); }
   | postfix_expression TOK_DOT TOK_IDENT
-    { $$ = new Node(AST_FIELD_REFERENCE_EXPRESSION, {$1, $3}); }
+    { $$ = new Node(AST_FIELD_REF_EXPRESSION, {$1, $3}); }
+  | postfix_expression TOK_LBRACKET assignment_expression TOK_RBRACKET
+    { $$ = new Node(AST_ARRAY_ELEMENT_REF_EXPRESSION, {$1, $3}); }
   ;
 
 argument_expression_list
@@ -548,7 +562,7 @@ primary_expression
   | TOK_STR_LIT
     { $$ = new Node(AST_LITERAL_VALUE, {$1}); }
   | TOK_IDENT
-    { $$ = new Node(AST_VARIABLE_REFERENCE, {$1}); }
+    { $$ = new Node(AST_VARIABLE_REF, {$1}); }
   | TOK_LPAREN assignment_expression TOK_RPAREN
     { $$ = $2; }
   ;
