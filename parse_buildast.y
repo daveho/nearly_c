@@ -123,7 +123,7 @@ namespace {
 
 %type<node> unit top_level_declaration function_or_variable_declaration_or_definition
 %type<node> simple_variable_declaration
-%type<node> declarator_list declarator
+%type<node> declarator_list declarator non_pointer_declarator
 %type<node> function_definition_or_declaration
 %type<node> function_parameter_list opt_parameter_list parameter_list parameter
 %type<node> type basic_type basic_type_keyword
@@ -179,10 +179,20 @@ declarator_list
     { $$ = $3; $$->prepend_kid($1); }
   ;
 
-  /* for now, only variables can be declared */
+  /* pointers are lower precedence than identifiers/arrays */
 declarator
+  : TOK_ASTERISK declarator
+    { $$ = new Node(AST_POINTER_DECLARATOR, {$2}); }
+  | non_pointer_declarator
+    { $$ = $1; }
+  ;
+
+  /* identifiers and arrays are the highest-precedence declarators */
+non_pointer_declarator
   : TOK_IDENT
     { $$ = new Node(AST_NAMED_DECLARATOR, {$1}); }
+  | non_pointer_declarator TOK_LBRACKET TOK_INT_LIT TOK_RBRACKET
+    { $$ = new Node(AST_ARRAY_DECLARATOR, {$1, $3}); }
   ;
 
 function_definition_or_declaration
