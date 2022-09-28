@@ -9,3 +9,6 @@
 /grammar_symbols.cpp
 /depend.mak
 /parse.output
+/ast.cpp
+/ast_visitor.h
+/ast_visitor.cpp
