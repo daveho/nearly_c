@@ -18,6 +18,8 @@ def gen_ast_visitor_h(outf, ast_tags)
 #ifndef AST_VISITOR_H
 #define AST_VISITOR_H
 
+class Node;
+
 class ASTVisitor {
 public:
   ASTVisitor();
@@ -32,6 +34,8 @@ EOF1
 
   outf.print <<"EOF2"
   virtual void visit_children(Node *n);
+
+  virtual void visit_token(Node *n);
 };
 
 #endif // AST_VISITOR_H
@@ -64,6 +68,13 @@ EOF4
   outf.print <<"EOF5"
 
 void ASTVisitor::visit(Node *n) {
+  // assume that any node with a tag value less than 1000
+  // is a token
+  if (n->get_tag() < 1000) {
+    visit_token(n);
+    return;
+  }
+
   switch (n->get_tag()) {
 EOF5
 
@@ -82,6 +93,10 @@ void ASTVisitor::visit_children(Node *n) {
   for (auto i = n->cbegin(); i != n->cend(); ++i) {
     visit(*i);
   }
+}
+
+void ASTVisitor::visit_token(Node *n) {
+  // default implementation does nothing
 }
 EOF6
 end
