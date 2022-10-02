@@ -327,12 +327,12 @@ statement
 
 struct_type_definition
   : TOK_STRUCT TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE TOK_SEMICOLON
-    { $$ = new Node(AST_STRUCT_TYPE_DEFINITION, {$4}); }
+    { $$ = new Node(AST_STRUCT_TYPE_DEFINITION, {$2, $4}); }
   ;
 
 union_type_definition
   : TOK_UNION TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE TOK_SEMICOLON
-    { $$ = new Node(AST_UNION_TYPE_DEFINITION, {$4}); }
+    { $$ = new Node(AST_UNION_TYPE_DEFINITION, {$2, $4}); }
   ;
 
 opt_simple_variable_declaration_list
