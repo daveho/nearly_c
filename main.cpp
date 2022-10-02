@@ -21,16 +21,20 @@
 #include <cstdlib>
 #include "context.h"
 #include "ast.h"
+#include "grammar_symbols.h"
+#include "node.h"
 #include "exceptions.h"
 
 void usage() {
   fprintf(stderr, "Usage: nearly_c [options...] <filename>\n"
                   "Options:\n"
+                  "  -l   print tokens\n"
                   "  -p   print parse tree\n");
   exit(1);
 }
 
 enum class Mode {
+  PRINT_TOKENS,
   PRINT_PARSE_TREE,
   COMPILE,
 };
@@ -47,7 +51,9 @@ int main(int argc, char **argv) {
   int index = 1;
   while (index < argc) {
     std::string arg(argv[index]);
-    if (arg == "-p") {
+    if (arg == "-l") {
+      mode = Mode::PRINT_TOKENS;
+    } else if (arg == "-p") {
       mode = Mode::PRINT_PARSE_TREE;
     } else {
       break;
@@ -78,17 +84,27 @@ int main(int argc, char **argv) {
 void process_source_file(const std::string &filename, Mode mode) {
   Context ctx;
 
-  // Parse the input
-  ctx.parse(filename);
-  Node *ast = ctx.get_ast();
+  if (mode == Mode::PRINT_TOKENS) {
+    std::vector<Node *> tokens;
+    ctx.scan_tokens(filename, tokens);
+    for (auto i = tokens.begin(); i != tokens.end(); ++i) {
+      Node *tok = *i;
+      printf("%d:%s[%s]\n", tok->get_tag(), get_grammar_symbol_name(tok->get_tag()), tok->get_str().c_str());
+      delete tok;
+    }
+  } else {
+    // Parse the input
+    ctx.parse(filename);
 
-  if (mode == Mode::PRINT_PARSE_TREE) {
-    // Note that we use an ASTTreePrint object to print the parse
-    // tree. That way, the parser can build either a parse tree or
-    // an AST, and tree printing should work correctly.
-    ASTTreePrint ptp;
-    ptp.print(ast);
-  } else if (mode == Mode::COMPILE) {
-    printf("TODO: compile the source code\n");
+    if (mode == Mode::PRINT_PARSE_TREE) {
+      // Note that we use an ASTTreePrint object to print the parse
+      // tree. That way, the parser can build either a parse tree or
+      // an AST, and tree printing should work correctly.
+      Node *ast = ctx.get_ast();
+      ASTTreePrint ptp;
+      ptp.print(ast);
+    } else if (mode == Mode::COMPILE) {
+      printf("TODO: compile the source code\n");
+    }
   }
 }

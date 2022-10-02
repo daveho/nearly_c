@@ -20,6 +20,8 @@
 
 #include <set>
 #include <memory>
+#include <algorithm>
+#include <iterator>
 #include <cassert>
 #include "exceptions.h"
 #include "node.h"
@@ -44,7 +46,10 @@ struct CloseFile {
   }
 };
 
-void Context::parse(const std::string &filename) {
+namespace {
+
+template<typename Fn>
+void process_source_file(const std::string &filename, Fn fn) {
   // open the input source file
   std::unique_ptr<FILE, CloseFile> in(fopen(filename.c_str(), "r"));
   if (!in) {
@@ -63,21 +68,49 @@ void Context::parse(const std::string &filename) {
   // make the ParserState available from the lexer state
   yyset_extra(pp.get(), pp->scan_info);
 
-  // parse the input source code
-  yyparse(pp.get());
+  // use the ParserState to either scan tokens or parse the input
+  // to build an AST
+  fn(pp.get());
+}
 
-  // free memory allocated by flex
-  yylex_destroy(pp->scan_info);
+}
 
-  m_ast = pp->parse_tree;
+void Context::scan_tokens(const std::string &filename, std::vector<Node *> &tokens) {
+  auto callback = [&](ParserState *pp) {
+    YYSTYPE yylval;
 
-  // delete any Nodes that were created by the lexer,
-  // but weren't incorporated into the parse tree
-  std::set<Node *> tree_nodes;
-  m_ast->preorder([&tree_nodes](Node *n) { tree_nodes.insert(n); });
-  for (auto i = pp->tokens.begin(); i != pp->tokens.end(); ++i) {
-    if (tree_nodes.count(*i) == 0) {
-      delete *i;
+    // the lexer will store pointers to all of the allocated
+    // token objects in the ParserState, so all we need to do
+    // is call yylex() until we reach the end of the input
+    while (yylex(&yylval, pp->scan_info) != 0)
+      ;
+
+    std::copy(pp->tokens.begin(), pp->tokens.end(), std::back_inserter(tokens));
+  };
+
+  process_source_file(filename, callback);
+}
+
+void Context::parse(const std::string &filename) {
+  auto callback = [&](ParserState *pp) {
+    // parse the input source code
+    yyparse(pp);
+
+    // free memory allocated by flex
+    yylex_destroy(pp->scan_info);
+
+    m_ast = pp->parse_tree;
+
+    // delete any Nodes that were created by the lexer,
+    // but weren't incorporated into the parse tree
+    std::set<Node *> tree_nodes;
+    m_ast->preorder([&tree_nodes](Node *n) { tree_nodes.insert(n); });
+    for (auto i = pp->tokens.begin(); i != pp->tokens.end(); ++i) {
+      if (tree_nodes.count(*i) == 0) {
+        delete *i;
+      }
     }
-  }
+  };
+
+  process_source_file(filename, callback);
 }

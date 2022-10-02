@@ -21,6 +21,7 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+#include <vector>
 #include <string>
 class Node;
 
@@ -38,6 +39,9 @@ private:
 public:
   Context();
   ~Context();
+
+  // scan the input and store the resulting tokens in a vector
+  void scan_tokens(const std::string &filename, std::vector<Node *> &tokens);
 
   // Parse an input file and build an AST
   void parse(const std::string &filename);

@@ -67,6 +67,7 @@ int yylex(YYSTYPE *, void *);
 %token<node> TOK_LPAREN TOK_RPAREN TOK_LBRACKET TOK_RBRACKET TOK_LBRACE TOK_RBRACE
 %token<node> TOK_SEMICOLON TOK_COLON
 %token<node> TOK_COMMA TOK_DOT TOK_QUESTION TOK_NOT
+%token<node> TOK_ARROW
 
 %token<node> TOK_PLUS TOK_INCREMENT TOK_MINUS TOK_DECREMENT
 %token<node> TOK_ASTERISK TOK_DIVIDE TOK_MOD
@@ -312,12 +313,12 @@ statement
   ;
 
 struct_type_definition
-  : TOK_STRUCT TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE
+  : TOK_STRUCT TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE TOK_SEMICOLON
     { $$ = new Node(NODE_struct_type_definition, {$1, $2, $3, $4, $5}); }
   ;
 
 union_type_definition
-  : TOK_UNION TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE
+  : TOK_UNION TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE TOK_SEMICOLON
     { $$ = new Node(NODE_union_type_definition, {$1, $2, $3, $4, $5}); }
   ;
 
@@ -510,6 +511,8 @@ postfix_expression
   | postfix_expression TOK_LPAREN argument_expression_list TOK_RPAREN
     { $$ = new Node(NODE_postfix_expression, {$1, $2, $3, $4}); }
   | postfix_expression TOK_DOT TOK_IDENT
+    { $$ = new Node(NODE_postfix_expression, {$1, $2, $3}); }
+  | postfix_expression TOK_ARROW TOK_IDENT
     { $$ = new Node(NODE_postfix_expression, {$1, $2, $3}); }
   | postfix_expression TOK_LBRACKET assignment_expression TOK_RBRACKET
     { $$ = new Node(NODE_postfix_expression, {$1, $2, $3, $4}); }

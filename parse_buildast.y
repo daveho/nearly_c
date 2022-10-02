@@ -80,6 +80,7 @@ namespace {
 %token<node> TOK_LPAREN TOK_RPAREN TOK_LBRACKET TOK_RBRACKET TOK_LBRACE TOK_RBRACE
 %token<node> TOK_SEMICOLON TOK_COLON
 %token<node> TOK_COMMA TOK_DOT TOK_QUESTION TOK_NOT
+%token<node> TOK_ARROW
 
 %token<node> TOK_PLUS TOK_INCREMENT TOK_MINUS TOK_DECREMENT
 %token<node> TOK_ASTERISK TOK_DIVIDE TOK_MOD
@@ -325,12 +326,12 @@ statement
   ;
 
 struct_type_definition
-  : TOK_STRUCT TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE
+  : TOK_STRUCT TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE TOK_SEMICOLON
     { $$ = new Node(AST_STRUCT_TYPE_DEFINITION, {$4}); }
   ;
 
 union_type_definition
-  : TOK_UNION TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE
+  : TOK_UNION TOK_IDENT TOK_LBRACE opt_simple_variable_declaration_list TOK_RBRACE TOK_SEMICOLON
     { $$ = new Node(AST_UNION_TYPE_DEFINITION, {$4}); }
   ;
 
@@ -541,6 +542,8 @@ postfix_expression
     { $$ = new Node(AST_FUNCTION_CALL_EXPRESSION, {$1, $3}); }
   | postfix_expression TOK_DOT TOK_IDENT
     { $$ = new Node(AST_FIELD_REF_EXPRESSION, {$1, $3}); }
+  | postfix_expression TOK_ARROW TOK_IDENT
+    { $$ = new Node(AST_INDIRECT_FIELD_REF_EXPRESSION, {$1, $3}); }
   | postfix_expression TOK_LBRACKET assignment_expression TOK_RBRACKET
     { $$ = new Node(AST_ARRAY_ELEMENT_REF_EXPRESSION, {$1, $3}); }
   ;
