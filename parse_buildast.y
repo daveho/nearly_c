@@ -38,9 +38,9 @@ typedef union YYSTYPE YYSTYPE;
 int yylex(YYSTYPE *, void *);
 
 namespace {
-  // This function is called to add a TOK_UNSPECIFIED_STORAGE token
-  // to the beginning of a declaration where the storage class was not
-  // specified explicitly.
+  // All variable declarations default to having "unspecified" storage.
+  // If an explicit storage class (static or extern) is specified,
+  // this will be overridden.
   void handle_unspecified_storage(Node *ast, struct ParserState *pp) {
     Node *first_kid = ast->get_kid(0);
     Node *unspecified_storage = new Node(NODE_TOK_UNSPECIFIED_STORAGE);
@@ -150,11 +150,11 @@ unit
 
 top_level_declaration
   : function_or_variable_declaration_or_definition
-    { $$ = $1; handle_unspecified_storage($$, pp); }
+    { $$ = $1; }
   | TOK_STATIC function_or_variable_declaration_or_definition
-    { $$ = $2; $$->prepend_kid($1); }
+    { $$ = $2; $$->unshift_kid(); $$->prepend_kid($1); }
   | TOK_EXTERN function_or_variable_declaration_or_definition
-    { $$ = $2; $$->prepend_kid($1); }
+    { $$ = $2; $$->unshift_kid(); $$->prepend_kid($1); }
   | struct_type_definition
     { $$ = $1; }
   | union_type_definition
@@ -170,7 +170,7 @@ function_or_variable_declaration_or_definition
 
 simple_variable_declaration
   : type declarator_list TOK_SEMICOLON
-    { $$ = new Node(AST_VARIABLE_DECLARATION, {$1, $2}); }
+    { $$ = new Node(AST_VARIABLE_DECLARATION, {$1, $2}); handle_unspecified_storage($$, pp);  }
   ;
 
 declarator_list
@@ -293,11 +293,11 @@ statement
   : TOK_SEMICOLON
     { $$ = new Node(AST_EMPTY_STATEMENT); }
   | simple_variable_declaration
-    { $$ = $1; handle_unspecified_storage($$, pp); }
+    { $$ = $1; }
   | TOK_STATIC simple_variable_declaration
-    { $$ = $2; $$->prepend_kid($1); }
+    { $$ = $2; $$->unshift_kid(); $$->prepend_kid($1); }
   | TOK_EXTERN simple_variable_declaration
-    { $$ = $2; $$->prepend_kid($1); }
+    { $$ = $2; $$->unshift_kid(); $$->prepend_kid($1); }
   | assignment_expression TOK_SEMICOLON
     { $$ = new Node(AST_EXPRESSION_STATEMENT, {$1}); }
   | TOK_RETURN TOK_SEMICOLON

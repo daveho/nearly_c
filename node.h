@@ -68,6 +68,7 @@ public:
   unsigned get_num_kids() const { return unsigned(m_kids.size()); }
   Node *get_kid(unsigned index) const { return m_kids.at(index); }
   Node *get_last_kid() const { return m_kids.back(); }
+  void unshift_kid();
 
   const_iterator cbegin() const { return m_kids.cbegin(); }
   const_iterator cend() const { return m_kids.cend(); }
