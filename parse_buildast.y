@@ -46,6 +46,7 @@ namespace {
     Node *unspecified_storage = new Node(NODE_TOK_UNSPECIFIED_STORAGE);
     unspecified_storage->set_loc(first_kid->get_loc());
     ast->prepend_kid(unspecified_storage);
+    pp->tokens.push_back(unspecified_storage);
   }
 }
 %}
@@ -152,9 +153,9 @@ top_level_declaration
   : function_or_variable_declaration_or_definition
     { $$ = $1; }
   | TOK_STATIC function_or_variable_declaration_or_definition
-    { $$ = $2; $$->unshift_kid(); $$->prepend_kid($1); }
+    { $$ = $2; $$->shift_kid(); $$->prepend_kid($1); }
   | TOK_EXTERN function_or_variable_declaration_or_definition
-    { $$ = $2; $$->unshift_kid(); $$->prepend_kid($1); }
+    { $$ = $2; $$->shift_kid(); $$->prepend_kid($1); }
   | struct_type_definition
     { $$ = $1; }
   | union_type_definition
@@ -295,9 +296,9 @@ statement
   | simple_variable_declaration
     { $$ = $1; }
   | TOK_STATIC simple_variable_declaration
-    { $$ = $2; $$->unshift_kid(); $$->prepend_kid($1); }
+    { $$ = $2; $$->shift_kid(); $$->prepend_kid($1); }
   | TOK_EXTERN simple_variable_declaration
-    { $$ = $2; $$->unshift_kid(); $$->prepend_kid($1); }
+    { $$ = $2; $$->shift_kid(); $$->prepend_kid($1); }
   | assignment_expression TOK_SEMICOLON
     { $$ = new Node(AST_EXPRESSION_STATEMENT, {$1}); }
   | TOK_RETURN TOK_SEMICOLON
@@ -537,7 +538,7 @@ postfix_expression
   | postfix_expression TOK_DECREMENT
     { $$ = new Node(AST_POSTFIX_EXPRESSION, {$2, $1}); }
   | postfix_expression TOK_LPAREN TOK_RPAREN
-    { $$ = new Node(AST_FUNCTION_CALL_EXPRESSION, {$1}); }
+    { $$ = new Node(AST_FUNCTION_CALL_EXPRESSION, {$1, new Node(AST_ARGUMENT_EXPRESSION_LIST)}); }
   | postfix_expression TOK_LPAREN argument_expression_list TOK_RPAREN
     { $$ = new Node(AST_FUNCTION_CALL_EXPRESSION, {$1, $3}); }
   | postfix_expression TOK_DOT TOK_IDENT

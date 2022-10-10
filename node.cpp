@@ -87,7 +87,7 @@ void Node::prepend_kid(Node *kid) {
   }
 }
 
-void Node::unshift_kid() {
+void Node::shift_kid() {
   m_kids.erase(m_kids.begin());
   if (!m_kids.empty()) {
     m_loc = m_kids.front()->get_loc();

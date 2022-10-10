@@ -68,7 +68,11 @@ public:
   unsigned get_num_kids() const { return unsigned(m_kids.size()); }
   Node *get_kid(unsigned index) const { return m_kids.at(index); }
   Node *get_last_kid() const { return m_kids.back(); }
-  void unshift_kid();
+  void shift_kid(); // removes the first child
+
+  // this is useful for restructuring the tree,
+  // but should be used with care
+  void set_kid(unsigned index, Node *kid) { m_kids.at(index) = kid; }
 
   const_iterator cbegin() const { return m_kids.cbegin(); }
   const_iterator cend() const { return m_kids.cend(); }
