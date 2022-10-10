@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
   } catch (BaseException &ex) {
     const Location &loc = ex.get_loc();
     if (loc.is_valid()) {
-      fprintf(stderr, "Error:%d:%d: %s\n", loc.get_line(), loc.get_col(), ex.what());
+      fprintf(stderr, "%d:%d:Error: %s\n", loc.get_line(), loc.get_col(), ex.what());
     } else {
       fprintf(stderr, "Error: %s\n", ex.what());
     }
