@@ -4,7 +4,7 @@ CXXFLAGS = -g -Wall -std=c++17 -I.
 GENERATED_SRCS = parse.tab.cpp lex.yy.cpp grammar_symbols.cpp \
 	ast.cpp ast_visitor.cpp
 GENERATED_HDRS = parse.tab.h lex.yy.h grammar_symbols.h ast_visitor.h
-SRCS = node.cpp node_base.cpp location.cpp treeprint.cpp \
+SRCS = node.cpp node_base.cpp location.cpp treeprint.cpp print_graph.cpp \
 	main.cpp context.cpp \
 	yyerror.cpp exceptions.cpp cpputil.cpp \
 	$(GENERATED_SRCS)

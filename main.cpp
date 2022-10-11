@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include "context.h"
 #include "ast.h"
+#include "print_graph.h"
 #include "grammar_symbols.h"
 #include "node.h"
 #include "exceptions.h"
@@ -29,13 +30,15 @@ void usage() {
   fprintf(stderr, "Usage: nearly_c [options...] <filename>\n"
                   "Options:\n"
                   "  -l   print tokens\n"
-                  "  -p   print parse tree\n");
+                  "  -p   print parse tree\n"
+                  "  -g   print graph (DOT/graphviz)\n");
   exit(1);
 }
 
 enum class Mode {
   PRINT_TOKENS,
   PRINT_PARSE_TREE,
+  PRINT_GRAPH,
   COMPILE,
 };
 
@@ -55,6 +58,7 @@ int main(int argc, char **argv) {
       mode = Mode::PRINT_TOKENS;
     } else if (arg == "-p") {
       mode = Mode::PRINT_PARSE_TREE;
+    } else if (arg == "-g") {
     } else {
       break;
     }
@@ -103,6 +107,10 @@ void process_source_file(const std::string &filename, Mode mode) {
       Node *ast = ctx.get_ast();
       ASTTreePrint ptp;
       ptp.print(ast);
+    } else if (mode == Mode::PRINT_GRAPH) {
+      Node *ast = ctx.get_ast();
+      PrintGraph agp(ast);
+      agp.print();
     } else if (mode == Mode::COMPILE) {
       printf("TODO: compile the source code\n");
     }
