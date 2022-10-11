@@ -59,6 +59,7 @@ int main(int argc, char **argv) {
     } else if (arg == "-p") {
       mode = Mode::PRINT_PARSE_TREE;
     } else if (arg == "-g") {
+      mode = Mode::PRINT_GRAPH;
     } else {
       break;
     }
