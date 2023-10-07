@@ -40,7 +40,8 @@ int main(void) {
 ## Why?
 
 My intention is to use this as the source language in a project sequence
-in the compilers course I teach.
+in the compilers course I teach. (Update: I did this in [Fall 2022](https://jhucompilers.github.io/fall2022)
+and it went reasonably well.)
 
 Full modern C (e.g., ISO C, C99, C11, etc.) has surprising complexity.
 However, with some careful omission of difficult language features, such
