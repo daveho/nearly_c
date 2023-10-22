@@ -498,7 +498,7 @@ cast_expression
   : unary_expression
     { $$ = $1; }
   | TOK_LPAREN type TOK_RPAREN cast_expression
-    { $$ = new Node(AST_CAST_EXPRESSION, {$1, $2}); }
+    { $$ = new Node(AST_CAST_EXPRESSION, {$2, $4}); }
   ;
 
 unary_expression
