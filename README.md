@@ -10,6 +10,7 @@ C features that are (currently) missing:
 * Pointers to functions
 * Pointers to arrays
 * Returning a pointer from a function
+* `break` and `continue`
 
 There are probably other things that are missing or don't work.
 
