@@ -1,4 +1,4 @@
-// Copyright (c) 2021, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright (c) 2021-2023, David H. Hovemeyer <david.hovemeyer@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -25,6 +25,10 @@
 #include "treeprint.h"
 class Node;
 
+//! @file
+//! ASTNodeTag enumeraion and ASTTreePrint class.
+
+//! Enumeration type providing tag values for AST nodes.
 enum ASTNodeTag {
   AST_UNIT = 10000,
   AST_VARIABLE_DECLARATION,
@@ -64,8 +68,10 @@ enum ASTNodeTag {
   AST_ARGUMENT_EXPRESSION_LIST,
   AST_VARIABLE_REF,
   AST_LITERAL_VALUE,
+  AST_IMPLICIT_CONVERSION, // semantic analysis can add these to mark locations of implicit type conversions
 };
 
+//! Support for printing a text representation of an AST.
 class ASTTreePrint : public ParseTreePrint {
 public:
   ASTTreePrint();

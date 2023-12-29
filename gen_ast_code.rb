@@ -1,5 +1,24 @@
 #! /usr/bin/env ruby
 
+# Copyright (c) 2021-2023, David H. Hovemeyer <david.hovemeyer@gmail.com>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+
 # This script reads ast.h and generates:
 #
 #   ast_visitor.h
@@ -20,21 +39,38 @@ def gen_ast_visitor_h(outf, ast_tags)
 
 class Node;
 
+//! Base class for AST visitors.
 class ASTVisitor {
 public:
   ASTVisitor();
   virtual ~ASTVisitor();
 
+  //! Visit given AST Node.
+  //! This will result in a call to an appropriate visitation member
+  //! function depending on the Node object's tag value.
+  //! For example, if the tag value is `AST_STATEMENT_LIST`, the
+  //! `visit_statement_list` member function will be called.
+  //!
+  //! @param n the Node to visit
   virtual void visit(Node *n);
 EOF1
 
   ast_tags.each do |tag|
+    outf.puts <<"EOF_VISIT_FN"
+  //! Visit a Node with the `#{tag}` tag value.
+  //! @param n a Node with the `#{tag}` tag value
+EOF_VISIT_FN
     outf.puts "  virtual void #{visit_function_name(tag)}(Node *n);"
   end
 
   outf.print <<"EOF2"
+  //! Call `visit` on each child Node of the given parent Node.
+  //! @param n the parent Node whose children should be visited
   virtual void visit_children(Node *n);
 
+  //! This method is called if the Node being visited is a token
+  //! (terminal symbol).
+  //! @param n the token (terminal symbol) Node
   virtual void visit_token(Node *n);
 };
 

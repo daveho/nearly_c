@@ -1,4 +1,4 @@
-// Copyright (c) 2021, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright (c) 2021-2023, David H. Hovemeyer <david.hovemeyer@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -23,27 +23,55 @@
 
 #include <string>
 
+//! A Location represents a source code location.
+//! Each token and (in theory) each AST node will have a Location.
+//! Location objects have value semantics (can be copied and assigned.)
 class Location {
 private:
   std::string m_srcfile;
   int m_line, m_col;
 
 public:
+  //! Default constructor. The Location will be invalid.
   Location();
+
+  //! Location from source file, line number, and column number.
+  //! @param srcfile the name of the source file
+  //! @param line the line number
+  //! @param col the column number
   Location(const std::string &srcfile, int line, int col);
+
+  //! Copy constructor.
+  //! @param other the Location object to copy from
   Location(const Location &other);
+
   ~Location();
 
+  //! Assignment operator.
+  //! @param rhs the Location object to copy from
   Location &operator=(const Location &rhs);
 
+  //! Check whether this Location is valid.
+  //! @return true if this Location is valid, false if not
   bool is_valid() const { return m_line > 0; }
 
+  //! Get the source file name.
+  //! @return the source file name
   std::string get_srcfile() const { return m_srcfile; }
+
+  //! Get the source line number (1 for the first line).
+  //! @return the source line number
   int get_line() const { return m_line; }
+
+  //! Get the source column number (1 for the first column).
+  //! @return the source column number
   int get_col() const { return m_col; }
 
+  //! Advance the Location by the given number of character positions.
+  //! @param num_cols the number of character positions to advance
   void advance(int num_cols) { m_col += num_cols; }
 
+  //! Advance the Location to the beginning of the next line.
   void next_line() { m_line++; m_col = 1; }
 };
 

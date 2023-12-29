@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright (c) 2021-2023, David H. Hovemeyer <david.hovemeyer@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -115,28 +115,4 @@ void SemanticError::raise(const Location &loc, const char *fmt, ...) {
   va_end(args);
 
   throw SemanticError(loc, errmsg);
-}
-
-////////////////////////////////////////////////////////////////////////
-// EvaluationError member functions
-////////////////////////////////////////////////////////////////////////
-
-EvaluationError::EvaluationError(const Location &loc, const std::string &desc)
-  : BaseException(loc, desc) {
-}
-
-EvaluationError::EvaluationError(const EvaluationError &other)
-  : BaseException(other) {
-}
-
-EvaluationError::~EvaluationError() {
-}
-
-void EvaluationError::raise(const Location &loc, const char *fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
-  std::string errmsg = cpputil::vformat(fmt, args);
-  va_end(args);
-
-  throw EvaluationError(loc, errmsg);
 }

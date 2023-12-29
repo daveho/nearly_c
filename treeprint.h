@@ -22,7 +22,7 @@
 #define TREEPRINT_H
 
 #include <string>
-struct Node;
+class Node;
 
 class TreePrint {
 public:

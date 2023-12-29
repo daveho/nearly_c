@@ -1,4 +1,4 @@
-// Copyright (c) 2021, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright (c) 2021-2023, David H. Hovemeyer <david.hovemeyer@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -21,18 +21,28 @@
 #ifndef CPPUTIL_H
 #define CPPUTIL_H
 
-// Utility functions for C++ code
+//! @file
+//! Utility functions for C++ code
 
 #include <string>
 
 namespace cpputil {
 
+//! Use `printf` formatting to create a `std::string` value.
+//! @param fmt the format string
+//! @param ... the arguments (corresponding to conversions in the format string)
+//! @return the formatted string
 std::string format(const char *fmt, ...)
 #ifdef __GNUC__
     __attribute__ ((format (printf, 1, 2)))
 #endif
     ;
 
+//! Format a `std::string` value from `printf`-style format string
+//! and `va_list` containing argument values.
+//! @param fmt the format string
+//! @param args the arguments (corresponding to conversions in the format string)
+//! @return the formatted string
 std::string vformat(const char *fmt, va_list args);
 
 }
