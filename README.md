@@ -1,5 +1,9 @@
 # NearlyC: a front-end for a substantial subset of C
 
+**Update**: a compiler skeleton based on NearlyC, called
+[NearlyCC](https://github.com/daveho/nearly_cc), is available.
+It's pretty nifty!
+
 This is a lexer and parser for a substantial subset of C.
 
 C features that are (currently) missing:
